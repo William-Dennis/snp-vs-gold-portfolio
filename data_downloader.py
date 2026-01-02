@@ -1,6 +1,8 @@
 import yfinance as yf
 import pandas as pd
+import streamlit as st
 
+@st.cache_data()
 def get_daily_data(ticker_symbol: str, period="10y"):
     ticker = yf.Ticker(ticker_symbol)
     close_series = ticker.history(period=period)["Close"]
