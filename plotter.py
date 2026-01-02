@@ -5,12 +5,13 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import griddata
 
+
 def plot_3d(
     df: pd.DataFrame,
     x: str,
     y: str,
     z: str,
-    mode: str = "scatter",   # "scatter" | "surface"
+    mode: str = "scatter",  # "scatter" | "surface"
     color: str | None = None,
     grid_size: int = 50,
     title: str | None = None,
