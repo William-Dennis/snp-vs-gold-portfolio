@@ -1,8 +1,9 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import math
-import random
-import yfinance as yf
+
+from data_downloader import get_two_series
 
 st.write("Hi!")
+
+data = get_two_series()
+
+st.dataframe(data)
