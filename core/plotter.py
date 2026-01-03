@@ -69,7 +69,7 @@ def _create_heatmap_figure(pivot_table, display_values, colorscale, zmid, colorb
             colorscale=colorscale,
             zmid=zmid,
             colorbar=dict(
-                title=colorbar_title,
+                title=dict(text=colorbar_title, side="right"),
                 ticksuffix=value_suffix if use_relative else "",
             ),
             text=hover_text,
