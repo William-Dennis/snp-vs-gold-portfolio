@@ -57,8 +57,8 @@ def plot_all_columns(
 
     if rebalance_dates and rebalance_amounts:
         for date, amount in zip(rebalance_dates, rebalance_amounts):
-            # Positive amount: selling SPY (blue) to buy GLD
-            # Negative amount: selling GLD to buy SPY (blue)
+            # Positive amount: selling SPY to buy GLD (gold line)
+            # Negative amount: selling GLD to buy SPY (blue line)
             if amount > 0:
                 color = LINE_CHART_COLORS["GLD"]  # Buying GLD
             else:

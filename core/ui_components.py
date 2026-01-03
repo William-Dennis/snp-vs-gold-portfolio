@@ -104,17 +104,16 @@ def render_performance_chart(data, strategy_result):
     rebalance_dates = strategy_result.index[rebalance_mask].tolist()
     rebalance_amounts = strategy_result.loc[rebalance_mask, "rebalance"].tolist()
 
+    # Pass rebalancing data only if toggle is enabled
+    show_rebalancing = st.session_state.show_rebalance_lines
+
     plot_all_columns(
         normalized_data,
         title="",
         y_label="Normalised Price",
         height=800,
-        rebalance_dates=rebalance_dates
-        if st.session_state.show_rebalance_lines
-        else None,
-        rebalance_amounts=rebalance_amounts
-        if st.session_state.show_rebalance_lines
-        else None,
+        rebalance_dates=rebalance_dates if show_rebalancing else None,
+        rebalance_amounts=rebalance_amounts if show_rebalancing else None,
     )
 
 
