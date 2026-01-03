@@ -24,9 +24,10 @@ Adjust your strategy parameters and compare against grid search results.
 data, grid_search_data = load_data_and_search()
 
 # Find optimal strategies
-best_sharpe = grid_search_data.nlargest(1, "sharpe").iloc[0]
-best_cagr = grid_search_data.nlargest(1, "cagr").iloc[0]
-best_drawdown = grid_search_data.nlargest(1, "max_drawdown").iloc[0]
+best_strategies = get_best_strategies(grid_search_data)
+best_sharpe = best_strategies["sharpe"]
+best_cagr = best_strategies["cagr"]
+best_drawdown = best_strategies["drawdown"]
 
 # Render strategy controls and get selected parameters
 strategy_t1_ratio, strategy_rebalance = render_strategy_controls(
