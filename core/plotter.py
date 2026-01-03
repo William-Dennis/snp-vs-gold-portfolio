@@ -5,6 +5,26 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
+# Strategy marker configuration
+MARKER_COLORS = {
+    "Your Strategy": "#FF6B6B",
+    "Max Sharpe Strategy": "#4ECDC4",
+    "Max CAGR Strategy": "#FFD93D",
+    "Min Drawdown Strategy": "#95E1D3",
+    "SPY Only": "#A8E6CF",
+    "GLD Only": "#C7CEEA",
+}
+
+MARKER_SYMBOLS = {
+    "Your Strategy": "star",
+    "Max Sharpe Strategy": "diamond",
+    "Max CAGR Strategy": "square",
+    "Min Drawdown Strategy": "circle",
+    "SPY Only": "triangle-up",
+    "GLD Only": "triangle-down",
+}
+
+
 def plot_all_columns(
     df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
 ):
@@ -100,28 +120,17 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
 
 def _add_strategy_markers(fig, strategy_markers, x, y):
     """Add scatter plot markers for strategies on the heatmap."""
-    marker_colors = {
-        "Your Strategy": "#FF6B6B",
-        "Max Sharpe Strategy": "#4ECDC4",
-        "Max CAGR Strategy": "#FFD93D",
-        "Min Drawdown Strategy": "#95E1D3",
-        "SPY Only": "#A8E6CF",
-        "GLD Only": "#C7CEEA",
-    }
-    
-    marker_symbols = {
-        "Your Strategy": "star",
-        "Max Sharpe Strategy": "diamond",
-        "Max CAGR Strategy": "square",
-        "Min Drawdown Strategy": "circle",
-        "SPY Only": "triangle-up",
-        "GLD Only": "triangle-down",
-    }
-    
     for marker in strategy_markers:
         name = marker["name"]
         x_val = marker[x]
         y_val = marker[y]
+        
+        # Format labels for hover template
+        x_label = _get_label(x)
+        y_label = _get_label(y)
+        x_formatted = _format_param_value(x, x_val)
+        y_formatted = _format_param_value(y, y_val)
+        hover_text = f"<b>{name}</b><br>{x_label}: {x_formatted}<br>{y_label}: {y_formatted}<extra></extra>"
         
         fig.add_trace(
             go.Scatter(
@@ -131,11 +140,11 @@ def _add_strategy_markers(fig, strategy_markers, x, y):
                 name=name,
                 marker=dict(
                     size=15,
-                    color=marker_colors.get(name, "#000000"),
-                    symbol=marker_symbols.get(name, "circle"),
+                    color=MARKER_COLORS.get(name, "#000000"),
+                    symbol=MARKER_SYMBOLS.get(name, "circle"),
                     line=dict(width=2, color="white"),
                 ),
-                hovertemplate=f"<b>{name}</b><br>{_get_label(x)}: {_format_param_value(x, x_val)}<br>{_get_label(y)}: {_format_param_value(y, y_val)}<extra></extra>",
+                hovertemplate=hover_text,
                 showlegend=True,
             )
         )
