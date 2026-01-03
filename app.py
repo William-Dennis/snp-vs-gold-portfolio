@@ -104,8 +104,8 @@ strategy_result, strategy_metrics = run_strategy_with_metrics(
 )
 
 # Calculate SPY and GLD metrics
-_, spy_metrics = run_strategy_with_metrics(data, "SPY", "SPY", 1.0, 0.0, 10_000)
-_, gld_metrics = run_strategy_with_metrics(data, "GLD", "GLD", 1.0, 0.0, 10_000)
+spy_metrics = calculate_metrics(data["SPY"].values, data.index[0], data.index[-1], 0)
+gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1], 0)
 
 # Combined performance chart
 st.subheader("Performance Comparison")
@@ -224,12 +224,13 @@ for i in range(0, len(metrics), 2):
             baseline_value=strategy_metrics[metrics[i]],
             use_relative=use_relative,
         )
-    with col2:
-        plot_2d_heatmap(
-            grid_search_data,
-            "rebalance_rate",
-            "t1_ratio",
-            metrics[i + 1],
-            baseline_value=strategy_metrics[metrics[i + 1]],
-            use_relative=use_relative,
-        )
+    if i + 1 < len(metrics):
+        with col2:
+            plot_2d_heatmap(
+                grid_search_data,
+                "rebalance_rate",
+                "t1_ratio",
+                metrics[i + 1],
+                baseline_value=strategy_metrics[metrics[i + 1]],
+                use_relative=use_relative,
+            )
