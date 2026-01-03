@@ -1,0 +1,92 @@
+"""UI components and helper functions for the Streamlit app."""
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+from .data_downloader import get_two_series
+from .grid_search import run_grid_search
+from .strategy import run_strategy
+from .metrics import calculate_metrics
+
+
+def run_strategy_with_metrics(
+    data: pd.DataFrame,
+    ticker1: str,
+    ticker2: str,
+    t1_ratio: float,
+    rebalance_rate: float,
+    starting_cash: float,
+) -> tuple[pd.DataFrame, dict]:
+    """Run strategy and calculate metrics in one call."""
+    result = run_strategy(data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    metrics = calculate_metrics(
+        result["total_cash_value"].values,
+        data.index[0],
+        data.index[-1],
+        int(np.sum(result["rebalance"] != 0)),
+    )
+    return result, metrics
+
+
+@st.cache_data
+def load_data_and_search():
+    """Load data and run grid search (cached for performance)."""
+    data = get_two_series()
+    grid_results = run_grid_search(data)
+    return data, grid_results
+
+
+def get_best_strategies(grid_search_data: pd.DataFrame) -> dict:
+    """Extract best strategies from grid search results."""
+    return {
+        "sharpe": grid_search_data.nlargest(1, "sharpe").iloc[0],
+        "cagr": grid_search_data.nlargest(1, "cagr").iloc[0],
+        "drawdown": grid_search_data.nlargest(1, "max_drawdown").iloc[0],
+    }
+
+
+def create_metrics_dataframe(
+    strategy_t1_ratio: float,
+    strategy_rebalance: float,
+    strategy_metrics: dict,
+    best_strategies: dict,
+    spy_metrics: dict,
+    gld_metrics: dict,
+) -> pd.DataFrame:
+    """Create formatted metrics comparison table."""
+    best_sharpe = best_strategies["sharpe"]
+    best_cagr = best_strategies["cagr"]
+    best_drawdown = best_strategies["drawdown"]
+
+    # Calculate metrics for best strategies (assuming these are already computed)
+    from .app_helpers import run_strategy_with_metrics
+
+    return pd.DataFrame(
+        {
+            "Strategy": [
+                "Your Strategy",
+                "Max Sharpe Strategy",
+                "Max CAGR Strategy",
+                "Min Drawdown Strategy",
+                "SPY Only",
+                "GLD Only",
+            ],
+            "SPY Allocation": [
+                strategy_t1_ratio,
+                float(best_sharpe["t1_ratio"]),
+                float(best_cagr["t1_ratio"]),
+                float(best_drawdown["t1_ratio"]),
+                1.0,
+                0.0,
+            ],
+            "Rebalance Threshold": [
+                strategy_rebalance,
+                float(best_sharpe["rebalance_rate"]),
+                float(best_cagr["rebalance_rate"]),
+                float(best_drawdown["rebalance_rate"]),
+                0.0,
+                0.0,
+            ],
+        }
+    )
