@@ -16,6 +16,7 @@ from core.ui_components import (
     render_metrics_table,
     render_heatmaps,
 )
+from core.data_downloader import AVAILABLE_PERIODS
 
 st.title("SPY vs GLD Portfolio Analysis")
 
@@ -24,8 +25,17 @@ Explore optimal rebalancing strategies for a two-asset portfolio.
 Adjust your strategy parameters and compare against grid search results.
 """)
 
+# Date range selection dropdown
+period_options = list(AVAILABLE_PERIODS.keys())
+selected_period = st.selectbox(
+    "Select Historical Period (ending 2025-12-31)",
+    options=period_options,
+    index=period_options.index("10yr"),  # Default to 10yr
+    help="Choose the historical period for analysis. All periods end on December 31, 2025."
+)
+
 # Load data and run grid search
-data, grid_search_data = load_data_and_search()
+data, grid_search_data = load_data_and_search(period=selected_period)
 
 # Find optimal strategies
 best_strategies = get_best_strategies(grid_search_data)
