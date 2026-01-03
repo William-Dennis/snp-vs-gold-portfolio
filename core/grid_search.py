@@ -48,15 +48,7 @@ def run_grid_search(
 
 
 def _process_grid(
-    conn,
-    df,
-    start_date,
-    end_date,
-    rebalance_ratios,
-    t1_ratios,
-    ticker1,
-    ticker2,
-    starting_cash,
+    conn, df, start_date, end_date, rebalance_ratios, t1_ratios, ticker1, ticker2, starting_cash
 ):
     """Process all parameter combinations in grid."""
     results = []
@@ -65,17 +57,9 @@ def _process_grid(
     for rebalance_rate in rebalance_ratios:
         for t1_ratio in t1_ratios:
             result_dict, insert_tuple = _process_params(
-                conn,
-                df,
-                start_date,
-                end_date,
-                rebalance_rate,
-                t1_ratio,
-                ticker1,
-                ticker2,
-                starting_cash,
+                conn, df, start_date, end_date, rebalance_rate, t1_ratio,
+                ticker1, ticker2, starting_cash
             )
-
             results.append(result_dict)
             if insert_tuple:
                 to_insert.append(insert_tuple)
@@ -83,16 +67,20 @@ def _process_grid(
     return results, to_insert
 
 
+def _compute_strategy_metrics(df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash):
+    """Compute strategy result and metrics."""
+    result = run_strategy(df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    metrics = calculate_metrics(
+        result["total_cash_value"].values,
+        df.index[0],
+        df.index[-1],
+        int(np.sum(result["rebalance"] != 0)),
+    )
+    return metrics
+
+
 def _process_params(
-    conn,
-    df,
-    start_date,
-    end_date,
-    rebalance_rate,
-    t1_ratio,
-    ticker1,
-    ticker2,
-    starting_cash,
+    conn, df, start_date, end_date, rebalance_rate, t1_ratio, ticker1, ticker2, starting_cash
 ):
     """Process single parameter combination."""
     hash_key = make_param_hash(
@@ -104,25 +92,12 @@ def _process_params(
         result_dict = {"rebalance_rate": rebalance_rate, "t1_ratio": t1_ratio, **cached}
         return result_dict, None
 
-    result = run_strategy(df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
-    metrics = calculate_metrics(
-        result["total_cash_value"].values,
-        df.index[0],
-        df.index[-1],
-        int(np.sum(result["rebalance"] != 0)),
-    )
+    metrics = _compute_strategy_metrics(df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
 
     result_dict = {"rebalance_rate": rebalance_rate, "t1_ratio": t1_ratio, **metrics}
     insert_tuple = (
-        hash_key,
-        start_date,
-        end_date,
-        ticker1,
-        ticker2,
-        t1_ratio,
-        rebalance_rate,
-        starting_cash,
-        *metrics.values(),
+        hash_key, start_date, end_date, ticker1, ticker2, t1_ratio,
+        rebalance_rate, starting_cash, *metrics.values(),
     )
 
     return result_dict, insert_tuple
