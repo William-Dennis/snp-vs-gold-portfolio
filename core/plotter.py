@@ -25,16 +25,45 @@ PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
 
 def plot_all_columns(
-    df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
+    df: pd.DataFrame,
+    x_label="Date",
+    y_label="Price",
+    title="",
+    height=800,
+    rebalance_dates=None,
 ):
-    """Plot all numeric columns as line charts."""
+    """Plot all numeric columns as line charts with optional rebalancing markers."""
     fig = go.Figure()
+
+    color_map = {
+        "SPY": "#1f77b4",  # Blue
+        "GLD": "#FFD700",  # Gold
+        "Your Strategy": "#FF6B6B",  # Red (consistent with marker colors)
+    }
 
     for col in df.select_dtypes(include="number").columns:
         series = df[col]
         fig.add_trace(
-            go.Scatter(x=series.index, y=series.values, mode="lines", name=col)
+            go.Scatter(
+                x=series.index,
+                y=series.values,
+                mode="lines",
+                name=col,
+                line=dict(color=color_map.get(col)),
+            )
         )
+
+    if rebalance_dates is not None and len(rebalance_dates) > 0:
+        for date in rebalance_dates:
+            fig.add_shape(
+                type="line",
+                x0=date,
+                x1=date,
+                y0=0,
+                y1=1,
+                yref="paper",
+                line=dict(color="rgba(128, 128, 128, 0.3)", width=1, dash="dot"),
+            )
 
     fig.update_layout(
         title=title,

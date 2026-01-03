@@ -50,7 +50,7 @@ def _render_sliders(col1, col2):
             min_value=0.0,
             max_value=100.0,
             step=1.0,
-            value = 50.0,
+            value=50.0,
             format="%.1f%%",
             key="t1_slider",
         )
@@ -62,7 +62,7 @@ def _render_sliders(col1, col2):
             min_value=1.0,
             max_value=11.0,
             step=0.1,
-            value = 11.0,
+            value=11.0,
             format="%.1f%%",
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
@@ -87,7 +87,16 @@ def render_performance_chart(data, strategy_result):
     normalized_data["Your Strategy"] = (
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
-    plot_all_columns(normalized_data, title="", y_label="Normalised Price", height=800)
+
+    rebalance_dates = strategy_result[strategy_result["rebalance"] != 0].index.tolist()
+
+    plot_all_columns(
+        normalized_data,
+        title="",
+        y_label="Normalised Price",
+        height=800,
+        rebalance_dates=rebalance_dates,
+    )
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):
