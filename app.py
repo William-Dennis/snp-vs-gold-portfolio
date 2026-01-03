@@ -113,7 +113,7 @@ normalized_data = data.copy()
 normalized_data["Your Strategy"] = (
     strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
 )
-plot_all_columns(normalized_data, title="", height=800)
+plot_all_columns(normalized_data, title="", height=600)
 
 # Metrics comparison table
 st.subheader("Performance Metrics")
