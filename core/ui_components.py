@@ -110,13 +110,13 @@ def _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawd
     ]
 
 
-def _get_metric_values(metric_key, strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics):
+def _get_metric_values(metric_key, strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics):
     """Get metric values for all strategies."""
     return [
         strategy_metrics[metric_key],
-        best_sharpe_metrics[metric_key],
-        best_cagr_metrics[metric_key],
-        best_drawdown_metrics[metric_key],
+        best_sharpe[metric_key],
+        best_cagr[metric_key],
+        best_drawdown[metric_key],
         spy_metrics[metric_key],
         gld_metrics[metric_key],
     ]
@@ -125,7 +125,6 @@ def _get_metric_values(metric_key, strategy_metrics, best_sharpe_metrics, best_c
 def _create_metrics_dataframe(
     strategy_t1_ratio, strategy_rebalance, strategy_metrics,
     best_sharpe, best_cagr, best_drawdown,
-    best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics,
     spy_metrics, gld_metrics
 ):
     """Create metrics comparison dataframe."""
@@ -137,10 +136,10 @@ def _create_metrics_dataframe(
             ],
             "SPY Allocation": _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown),
             "Rebalance Threshold": _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawdown),
-            "Sharpe": _get_metric_values("sharpe", strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics),
-            "CAGR": _get_metric_values("cagr", strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics),
-            "Max Drawdown": _get_metric_values("max_drawdown", strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics),
-            "Rebalances": _get_metric_values("num_rebalances", strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics),
+            "Sharpe": _get_metric_values("sharpe", strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics),
+            "CAGR": _get_metric_values("cagr", strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics),
+            "Max Drawdown": _get_metric_values("max_drawdown", strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics),
+            "Rebalances": _get_metric_values("num_rebalances", strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics),
         }
     )
 
@@ -164,9 +163,6 @@ def render_metrics_table(
     best_sharpe,
     best_cagr,
     best_drawdown,
-    best_sharpe_metrics,
-    best_cagr_metrics,
-    best_drawdown_metrics,
     spy_metrics,
     gld_metrics,
 ):
@@ -176,7 +172,6 @@ def render_metrics_table(
     metrics_df = _create_metrics_dataframe(
         strategy_t1_ratio, strategy_rebalance, strategy_metrics,
         best_sharpe, best_cagr, best_drawdown,
-        best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics,
         spy_metrics, gld_metrics
     )
     
