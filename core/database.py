@@ -29,6 +29,8 @@ def _create_results_table(conn: sqlite3.Connection) -> None:
             sharpe REAL,
             num_rebalances INTEGER,
             max_drawdown REAL,
+            max_weekly_drawdown REAL,
+            max_monthly_drawdown REAL,
             cagr REAL
         )
     """)
@@ -61,7 +63,7 @@ def make_param_hash(
 def get_cached_result(conn: sqlite3.Connection, hash_key: str) -> Optional[Dict]:
     """Retrieve cached results for given parameter hash."""
     cur = conn.execute(
-        "SELECT sharpe, num_rebalances, max_drawdown, cagr "
+        "SELECT sharpe, num_rebalances, max_drawdown, max_weekly_drawdown, max_monthly_drawdown, cagr "
         "FROM strategy_results WHERE hash = ?",
         (hash_key,),
     )
@@ -72,7 +74,9 @@ def get_cached_result(conn: sqlite3.Connection, hash_key: str) -> Optional[Dict]
             "sharpe": float(row[0]),
             "num_rebalances": int(row[1]),
             "max_drawdown": float(row[2]),
-            "cagr": float(row[3]),
+            "max_weekly_drawdown": float(row[3]),
+            "max_monthly_drawdown": float(row[4]),
+            "cagr": float(row[5]),
         }
     return None
 
@@ -87,8 +91,8 @@ def save_results_batch(conn: sqlite3.Connection, results: list) -> None:
         INSERT OR IGNORE INTO strategy_results
         (hash, start_date, end_date, ticker1, ticker2, t1_ratio, 
          rebalance_rate, starting_cash, sharpe, num_rebalances, 
-         max_drawdown, cagr)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         max_drawdown, max_weekly_drawdown, max_monthly_drawdown, cagr)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         results,
     )
