@@ -55,4 +55,4 @@ render_metrics_table(
     spy_metrics, gld_metrics
 )
 
-render_heatmaps(grid_search_data, strategy_metrics, use_relative)
+render_heatmaps(grid_search_data, strategy_metrics, use_relative, strategy_t1_ratio, strategy_rebalance, best_sharpe, best_cagr, best_drawdown)

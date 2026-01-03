@@ -182,9 +182,43 @@ def render_metrics_table(
     )
 
 
-def render_heatmaps(grid_search_data, strategy_metrics, use_relative):
-    """Render the grid search heatmaps."""
+def render_heatmaps(grid_search_data, strategy_metrics, use_relative, strategy_t1_ratio, strategy_rebalance, best_sharpe, best_cagr, best_drawdown):
+    """Render the grid search heatmaps with strategy markers."""
     st.subheader("Grid Search Results")
+
+    # Prepare strategy markers with their positions
+    strategy_markers = [
+        {
+            "name": "Your Strategy",
+            "rebalance_rate": strategy_rebalance,
+            "t1_ratio": strategy_t1_ratio,
+        },
+        {
+            "name": "Max Sharpe Strategy",
+            "rebalance_rate": float(best_sharpe["rebalance_rate"]),
+            "t1_ratio": float(best_sharpe["t1_ratio"]),
+        },
+        {
+            "name": "Max CAGR Strategy",
+            "rebalance_rate": float(best_cagr["rebalance_rate"]),
+            "t1_ratio": float(best_cagr["t1_ratio"]),
+        },
+        {
+            "name": "Min Drawdown Strategy",
+            "rebalance_rate": float(best_drawdown["rebalance_rate"]),
+            "t1_ratio": float(best_drawdown["t1_ratio"]),
+        },
+        {
+            "name": "SPY Only",
+            "rebalance_rate": 0.0,
+            "t1_ratio": 1.0,
+        },
+        {
+            "name": "GLD Only",
+            "rebalance_rate": 0.0,
+            "t1_ratio": 0.0,
+        },
+    ]
 
     metrics = ["sharpe", "cagr", "max_drawdown", "num_rebalances"]
 
@@ -198,6 +232,7 @@ def render_heatmaps(grid_search_data, strategy_metrics, use_relative):
                 metrics[i],
                 baseline_value=strategy_metrics[metrics[i]],
                 use_relative=use_relative,
+                strategy_markers=strategy_markers,
             )
         if i + 1 < len(metrics):
             with col2:
@@ -208,4 +243,5 @@ def render_heatmaps(grid_search_data, strategy_metrics, use_relative):
                     metrics[i + 1],
                     baseline_value=strategy_metrics[metrics[i + 1]],
                     use_relative=use_relative,
+                    strategy_markers=strategy_markers,
                 )

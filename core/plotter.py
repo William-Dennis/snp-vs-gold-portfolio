@@ -98,6 +98,49 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
     )
 
 
+def _add_strategy_markers(fig, strategy_markers, x, y):
+    """Add scatter plot markers for strategies on the heatmap."""
+    marker_colors = {
+        "Your Strategy": "#FF6B6B",
+        "Max Sharpe Strategy": "#4ECDC4",
+        "Max CAGR Strategy": "#FFD93D",
+        "Min Drawdown Strategy": "#95E1D3",
+        "SPY Only": "#A8E6CF",
+        "GLD Only": "#C7CEEA",
+    }
+    
+    marker_symbols = {
+        "Your Strategy": "star",
+        "Max Sharpe Strategy": "diamond",
+        "Max CAGR Strategy": "square",
+        "Min Drawdown Strategy": "circle",
+        "SPY Only": "triangle-up",
+        "GLD Only": "triangle-down",
+    }
+    
+    for marker in strategy_markers:
+        name = marker["name"]
+        x_val = marker[x]
+        y_val = marker[y]
+        
+        fig.add_trace(
+            go.Scatter(
+                x=[x_val],
+                y=[y_val],
+                mode="markers",
+                name=name,
+                marker=dict(
+                    size=15,
+                    color=marker_colors.get(name, "#000000"),
+                    symbol=marker_symbols.get(name, "circle"),
+                    line=dict(width=2, color="white"),
+                ),
+                hovertemplate=f"<b>{name}</b><br>{_get_label(x)}: {_format_param_value(x, x_val)}<br>{_get_label(y)}: {_format_param_value(y, y_val)}<extra></extra>",
+                showlegend=True,
+            )
+        )
+
+
 def plot_2d_heatmap(
     df: pd.DataFrame,
     x: str,
@@ -105,8 +148,9 @@ def plot_2d_heatmap(
     z: str,
     baseline_value: float = None,
     use_relative: bool = False,
+    strategy_markers: list = None,
 ):
-    """Plot professional square 2D heatmap with proper labels."""
+    """Plot professional square 2D heatmap with proper labels and strategy markers."""
     pivot_table, display_values, title, colorbar_title, colorscale, zmid, value_suffix, x_label, y_label, z_label = \
         _prepare_heatmap_data(df, x, y, z, baseline_value, use_relative)
     
@@ -118,6 +162,9 @@ def plot_2d_heatmap(
         pivot_table, display_values, colorscale, zmid,
         colorbar_title, value_suffix, use_relative, hover_text
     )
+    
+    if strategy_markers:
+        _add_strategy_markers(fig, strategy_markers, x, y)
     
     _update_heatmap_layout(fig, title, x_label, y_label, x)
     st.plotly_chart(fig, use_container_width=True)
