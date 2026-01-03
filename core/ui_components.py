@@ -110,13 +110,13 @@ def _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawd
     ]
 
 
-def _get_metric_values(metric_key, strategy_metrics, best_sharpe, best_cagr, best_drawdown, spy_metrics, gld_metrics):
+def _get_metric_values(metric_key, strategy_metrics, best_sharpe_metrics, best_cagr_metrics, best_drawdown_metrics, spy_metrics, gld_metrics):
     """Get metric values for all strategies."""
     return [
         strategy_metrics[metric_key],
-        best_sharpe[metric_key],
-        best_cagr[metric_key],
-        best_drawdown[metric_key],
+        best_sharpe_metrics[metric_key],
+        best_cagr_metrics[metric_key],
+        best_drawdown_metrics[metric_key],
         spy_metrics[metric_key],
         gld_metrics[metric_key],
     ]

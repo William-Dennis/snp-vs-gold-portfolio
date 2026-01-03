@@ -4,7 +4,7 @@ import streamlit as st
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 
-from core.app_helpers import load_data_and_search, run_strategy_with_metrics
+from core.app_helpers import load_data_and_search, run_strategy_with_metrics, get_best_strategies
 from core.metrics import calculate_metrics
 from core.ui_components import (
     render_strategy_controls,
