@@ -6,6 +6,29 @@ import sqlite3
 from typing import Dict, Optional
 
 
+def _add_missing_columns(conn: sqlite3.Connection) -> None:
+    """Add missing columns to existing table for backwards compatibility."""
+    cursor = conn.cursor()
+    
+    # Get existing columns
+    cursor.execute("PRAGMA table_info(strategy_results)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+    
+    # Add max_weekly_drawdown if missing
+    if "max_weekly_drawdown" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE strategy_results ADD COLUMN max_weekly_drawdown REAL"
+        )
+    
+    # Add max_monthly_drawdown if missing
+    if "max_monthly_drawdown" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE strategy_results ADD COLUMN max_monthly_drawdown REAL"
+        )
+    
+    conn.commit()
+
+
 def get_db_connection(db_path: str = "results_cache.db") -> sqlite3.Connection:
     """Create database connection and initialize schema."""
     conn = sqlite3.connect(db_path)
@@ -35,6 +58,9 @@ def _create_results_table(conn: sqlite3.Connection) -> None:
         )
     """)
     conn.commit()
+    
+    # Add missing columns if they don't exist (for database migration)
+    _add_missing_columns(conn)
 
 
 def make_param_hash(
@@ -70,6 +96,11 @@ def get_cached_result(conn: sqlite3.Connection, hash_key: str) -> Optional[Dict]
     row = cur.fetchone()
 
     if row:
+        # Check if any of the new metrics are NULL (from old cache entries)
+        # If so, treat as cache miss and return None to force recalculation
+        if row[3] is None or row[4] is None:  # max_weekly_drawdown or max_monthly_drawdown
+            return None
+        
         return {
             "sharpe": float(row[0]),
             "num_rebalances": int(row[1]),
