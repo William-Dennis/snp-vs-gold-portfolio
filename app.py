@@ -1,6 +1,7 @@
 """SPY vs GLD Portfolio Analysis - Streamlit App."""
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 from core.app_helpers import (
@@ -18,6 +19,22 @@ from core.ui_components import (
 from core.data_downloader import AVAILABLE_PERIODS
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
+
+# Google Analytics tracking
+components.html(
+    """
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEYDHR2Q26"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-GEYDHR2Q26');
+    </script>
+    """,
+    height=0,
+)
 st.title("SPY vs GLD Portfolio Analysis")
 
 st.markdown("""
