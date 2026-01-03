@@ -43,4 +43,6 @@ def get_best_strategies(grid_search_data: pd.DataFrame) -> dict:
         "sharpe": grid_search_data.nlargest(1, "sharpe").iloc[0],
         "cagr": grid_search_data.nlargest(1, "cagr").iloc[0],
         "drawdown": grid_search_data.nlargest(1, "max_drawdown").iloc[0],
+        "weekly_drawdown": grid_search_data.nlargest(1, "max_weekly_drawdown").iloc[0],
+        "monthly_drawdown": grid_search_data.nlargest(1, "max_monthly_drawdown").iloc[0],
     }

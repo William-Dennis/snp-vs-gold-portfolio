@@ -28,10 +28,12 @@ best_strategies = get_best_strategies(grid_search_data)
 best_sharpe = best_strategies["sharpe"]
 best_cagr = best_strategies["cagr"]
 best_drawdown = best_strategies["drawdown"]
+best_weekly_drawdown = best_strategies["weekly_drawdown"]
+best_monthly_drawdown = best_strategies["monthly_drawdown"]
 
 # Render strategy controls and get selected parameters
 strategy_t1_ratio, strategy_rebalance = render_strategy_controls(
-    best_sharpe, best_cagr, best_drawdown
+    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown
 )
 
 # Relative metrics toggle
@@ -51,7 +53,7 @@ render_performance_chart(data, strategy_result)
 
 render_metrics_table(
     strategy_t1_ratio, strategy_rebalance, strategy_metrics,
-    best_sharpe, best_cagr, best_drawdown,
+    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown,
     spy_metrics, gld_metrics
 )
 

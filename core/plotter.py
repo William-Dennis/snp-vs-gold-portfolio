@@ -131,6 +131,8 @@ def _get_label(param: str) -> str:
         "sharpe": "Sharpe Ratio",
         "cagr": "CAGR",
         "max_drawdown": "Max Drawdown",
+        "max_weekly_drawdown": "Max Weekly Drawdown",
+        "max_monthly_drawdown": "Max Monthly Drawdown",
         "num_rebalances": "Number of Rebalances",
     }
     return labels.get(param, param)
@@ -146,7 +148,7 @@ def _format_param_value(param: str, value: float) -> str:
 
 def _format_value(metric: str, value: float) -> str:
     """Format value based on metric type."""
-    if metric in ["cagr", "max_drawdown"]:
+    if metric in ["cagr", "max_drawdown", "max_weekly_drawdown", "max_monthly_drawdown"]:
         return f"{value:.2%}"
     elif metric == "sharpe":
         return f"{value:.4f}"
