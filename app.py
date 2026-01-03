@@ -2,7 +2,6 @@
 
 import streamlit as st
 
-st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 
 from core.app_helpers import (
     load_data_and_search,
@@ -18,6 +17,7 @@ from core.ui_components import (
 )
 from core.data_downloader import AVAILABLE_PERIODS
 
+st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 st.title("SPY vs GLD Portfolio Analysis")
 
 st.markdown("""
@@ -31,7 +31,7 @@ selected_period = st.selectbox(
     "Select Historical Period (ending 2025-12-31)",
     options=period_options,
     index=period_options.index("10yr"),  # Default to 10yr
-    help="Choose the historical period for analysis. All periods end on December 31, 2025."
+    help="Choose the historical period for analysis. All periods end on December 31, 2025.",
 )
 
 # Load data and run grid search
@@ -74,4 +74,13 @@ render_metrics_table(
     gld_metrics,
 )
 
-render_heatmaps(grid_search_data, strategy_metrics, use_relative, strategy_t1_ratio, strategy_rebalance, best_sharpe, best_cagr, best_drawdown)
+render_heatmaps(
+    grid_search_data,
+    strategy_metrics,
+    use_relative,
+    strategy_t1_ratio,
+    strategy_rebalance,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+)

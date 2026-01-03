@@ -44,7 +44,7 @@ def plot_all_columns(
         margin=dict(l=40, r=40, t=40, b=40),
     )
 
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, width="stretch")
 
 
 def _get_heatmap_style(z_label, baseline_value, z, use_relative):
@@ -152,7 +152,7 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x, y):
 
 def _add_strategy_markers(fig, strategy_markers, x, y):
     """Add scatter plot markers for strategies on the heatmap.
-    
+
     Args:
         fig: Plotly figure to add markers to
         strategy_markers: List of dicts with 'name', x, and y keys for each strategy
@@ -163,14 +163,14 @@ def _add_strategy_markers(fig, strategy_markers, x, y):
         name = marker["name"]
         x_val = marker[x]
         y_val = marker[y]
-        
+
         # Format labels for hover template
         x_label = _get_label(x)
         y_label = _get_label(y)
         x_formatted = _format_param_value(x, x_val)
         y_formatted = _format_param_value(y, y_val)
         hover_text = f"<b>{name}</b><br>{x_label}: {x_formatted}<br>{y_label}: {y_formatted}<extra></extra>"
-        
+
         fig.add_trace(
             go.Scatter(
                 x=[x_val],
@@ -229,9 +229,9 @@ def plot_2d_heatmap(
 
     if strategy_markers:
         _add_strategy_markers(fig, strategy_markers, x, y)
-    
+
     _update_heatmap_layout(fig, title, x_label, y_label, x, y)
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, width="stretch")
 
 
 def _get_label(param: str) -> str:
