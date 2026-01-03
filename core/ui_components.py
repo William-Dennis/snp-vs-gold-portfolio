@@ -11,19 +11,19 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col3:
-        if st.button("Max Sharpe Strategy", use_container_width=True):
+        if st.button("Max Sharpe Strategy", width='stretch'):
             st.session_state.t1_slider = float(best_sharpe["t1_ratio"]) * 100.0
             st.session_state.rebalance_slider = float(best_sharpe["rebalance_rate"]) * 100.0
             st.rerun()
 
     with col4:
-        if st.button("Max CAGR Strategy", use_container_width=True):
+        if st.button("Max CAGR Strategy", width='stretch'):
             st.session_state.t1_slider = float(best_cagr["t1_ratio"]) * 100.0
             st.session_state.rebalance_slider = float(best_cagr["rebalance_rate"]) * 100.0
             st.rerun()
 
     with col5:
-        if st.button("Min Drawdown Strategy", use_container_width=True):
+        if st.button("Min Drawdown Strategy", width='stretch'):
             st.session_state.t1_slider = float(best_drawdown["t1_ratio"]) * 100.0
             st.session_state.rebalance_slider = float(best_drawdown["rebalance_rate"]) * 100.0
             st.rerun()
@@ -237,7 +237,7 @@ def render_metrics_table(
 
     st.dataframe(
         metrics_df.style.format(_get_format_spec()),
-        use_container_width=True,
+        width='stretch',
         hide_index=True,
     )
 

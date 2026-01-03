@@ -28,7 +28,7 @@ def plot_all_columns(
         margin=dict(l=40, r=40, t=40, b=40),
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def _get_heatmap_style(z_label, baseline_value, z, use_relative):
@@ -165,7 +165,7 @@ def plot_2d_heatmap(
     )
 
     _update_heatmap_layout(fig, title, x_label, y_label, x, y)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def _get_label(param: str) -> str:
