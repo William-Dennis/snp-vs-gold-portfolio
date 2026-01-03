@@ -119,7 +119,14 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
 
 
 def _add_strategy_markers(fig, strategy_markers, x, y):
-    """Add scatter plot markers for strategies on the heatmap."""
+    """Add scatter plot markers for strategies on the heatmap.
+    
+    Args:
+        fig: Plotly figure to add markers to
+        strategy_markers: List of dicts with 'name', x, and y keys for each strategy
+        x: Name of x-axis parameter (must match key in strategy_markers dicts)
+        y: Name of y-axis parameter (must match key in strategy_markers dicts)
+    """
     for marker in strategy_markers:
         name = marker["name"]
         x_val = marker[x]
