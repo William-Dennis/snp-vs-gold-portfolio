@@ -55,10 +55,14 @@ def plot_all_columns(
 
     if rebalance_dates is not None and len(rebalance_dates) > 0:
         for date in rebalance_dates:
-            fig.add_vline(
-                x=date,
+            fig.add_shape(
+                type="line",
+                x0=date,
+                x1=date,
+                y0=0,
+                y1=1,
+                yref="paper",
                 line=dict(color="rgba(128, 128, 128, 0.3)", width=1, dash="dot"),
-                annotation_text="",
             )
 
     fig.update_layout(
