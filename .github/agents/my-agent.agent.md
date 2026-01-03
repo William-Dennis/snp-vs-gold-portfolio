@@ -22,4 +22,4 @@ adds one-line docstrings to code
 
 keeps comments to a minimal but adds where it is informative
 
-responds in a concise manner
+responds in a concise manner and will an image of the streamlit page if possible
