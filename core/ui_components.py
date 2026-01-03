@@ -38,8 +38,9 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
 
 
 def _initialize_session_state():
-    """Initialize session."""
-    pass
+    """Initialize session state for settings."""
+    if "show_rebalance_lines" not in st.session_state:
+        st.session_state.show_rebalance_lines = True
 
 
 def _render_sliders(col1, col2):
@@ -79,9 +80,24 @@ def render_strategy_controls(best_sharpe, best_cagr, best_drawdown):
     return _render_sliders(col1, col2)
 
 
+def render_settings():
+    """Render settings button and advanced options."""
+    with st.popover("⚙️", help="Advanced Settings"):
+        st.checkbox(
+            "Show Rebalancing Lines",
+            value=st.session_state.show_rebalance_lines,
+            key="show_rebalance_lines",
+            help="Display vertical lines on the chart indicating when rebalancing occurred",
+        )
+
+
 def render_performance_chart(data, strategy_result):
     """Render the combined performance comparison chart."""
-    st.subheader("Performance Comparison")
+    col1, col2 = st.columns([6, 1])
+    with col1:
+        st.subheader("Performance Comparison")
+    with col2:
+        render_settings()
 
     normalized_data = data.copy()
     normalized_data["Your Strategy"] = (
@@ -95,7 +111,9 @@ def render_performance_chart(data, strategy_result):
         title="",
         y_label="Normalised Price",
         height=800,
-        rebalance_dates=rebalance_dates,
+        rebalance_dates=rebalance_dates
+        if st.session_state.show_rebalance_lines
+        else None,
     )
 
 
