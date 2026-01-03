@@ -38,7 +38,7 @@ def plot_all_columns(
     color_map = {
         "SPY": "#1f77b4",  # Blue
         "GLD": "#FFD700",  # Gold
-        "Your Strategy": "#2ca02c",  # Green
+        "Your Strategy": "#FF6B6B",  # Red (consistent with marker colors)
     }
 
     for col in df.select_dtypes(include="number").columns:
