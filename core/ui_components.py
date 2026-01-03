@@ -61,10 +61,10 @@ def _render_sliders(col1, col2):
     with col2:
         strategy_rebalance_pct = st.slider(
             "Rebalance Threshold",
-            min_value=0.0,
-            max_value=0.10,
+            min_value=0.01,
+            max_value=0.11,
             step=0.001,
-            format="%.4f%%",
+            format="%.1f%%",
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
         )
