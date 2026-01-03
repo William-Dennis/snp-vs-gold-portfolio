@@ -32,9 +32,9 @@ def run_strategy_with_metrics(
 
 
 @st.cache_data
-def load_data_and_search():
+def load_data_and_search(period: str = "10yr"):
     """Load data and run grid search (cached for performance)."""
-    data = get_two_series()
+    data = get_two_series(period=period)
     grid_results = run_grid_search(data)
     return data, grid_results
 

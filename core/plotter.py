@@ -5,6 +5,25 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
+# Strategy marker configuration
+MARKER_COLORS = {
+    "Your Strategy": "#FF6B6B",
+    "Max Sharpe Strategy": "#4ECDC4",
+    "Max CAGR Strategy": "#FFD93D",
+    "Min Drawdown Strategy": "#95E1D3",
+}
+
+MARKER_SYMBOLS = {
+    "Your Strategy": "star",
+    "Max Sharpe Strategy": "diamond",
+    "Max CAGR Strategy": "square",
+    "Min Drawdown Strategy": "circle",
+}
+
+# Parameters that should be displayed as percentages
+PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
+
+
 def plot_all_columns(
     df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
 ):
@@ -25,7 +44,7 @@ def plot_all_columns(
         margin=dict(l=40, r=40, t=40, b=40),
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def _get_heatmap_style(z_label, baseline_value, z, use_relative):
@@ -95,7 +114,7 @@ def _create_heatmap_figure(
             colorscale=colorscale,
             zmid=zmid,
             colorbar=dict(
-                title=colorbar_title,
+                title=dict(text=colorbar_title, side="right"),
                 ticksuffix=value_suffix if use_relative else "",
             ),
             text=hover_text,
@@ -104,24 +123,70 @@ def _create_heatmap_figure(
     )
 
 
-def _update_heatmap_layout(fig, title, x_label, y_label, x):
+def _update_heatmap_layout(fig, title, x_label, y_label, x, y):
     """Update heatmap figure layout."""
     fig.update_layout(
         title=dict(text=title, x=0.5, xanchor="center"),
         height=600,
-        margin=dict(l=60, r=60, b=60, t=80),
+        margin=dict(l=60, r=60, b=120, t=80),
         xaxis=dict(
             title=x_label,
             side="bottom",
-            tickformat=".3f" if x == "rebalance_rate" else ".2f",
+            tickformat=".1%" if x in PERCENTAGE_PARAMS else ".2f",
         ),
         yaxis=dict(
             title=y_label,
             autorange="reversed",
-            tickformat=".2f",
+            tickformat=".1%" if y in PERCENTAGE_PARAMS else ".2f",
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.15,
+            xanchor="center",
+            x=0.5,
         ),
         font=dict(size=12),
     )
+
+
+def _add_strategy_markers(fig, strategy_markers, x, y):
+    """Add scatter plot markers for strategies on the heatmap.
+
+    Args:
+        fig: Plotly figure to add markers to
+        strategy_markers: List of dicts with 'name', x, and y keys for each strategy
+        x: Name of x-axis parameter (must match key in strategy_markers dicts)
+        y: Name of y-axis parameter (must match key in strategy_markers dicts)
+    """
+    for marker in strategy_markers:
+        name = marker["name"]
+        x_val = marker[x]
+        y_val = marker[y]
+
+        # Format labels for hover template
+        x_label = _get_label(x)
+        y_label = _get_label(y)
+        x_formatted = _format_param_value(x, x_val)
+        y_formatted = _format_param_value(y, y_val)
+        hover_text = f"<b>{name}</b><br>{x_label}: {x_formatted}<br>{y_label}: {y_formatted}<extra></extra>"
+
+        fig.add_trace(
+            go.Scatter(
+                x=[x_val],
+                y=[y_val],
+                mode="markers",
+                name=name,
+                marker=dict(
+                    size=15,
+                    color=MARKER_COLORS.get(name, "#000000"),
+                    symbol=MARKER_SYMBOLS.get(name, "circle"),
+                    line=dict(width=2, color="white"),
+                ),
+                hovertemplate=hover_text,
+                showlegend=True,
+            )
+        )
 
 
 def plot_2d_heatmap(
@@ -131,8 +196,9 @@ def plot_2d_heatmap(
     z: str,
     baseline_value: float = None,
     use_relative: bool = False,
+    strategy_markers: list = None,
 ):
-    """Plot professional square 2D heatmap with proper labels."""
+    """Plot professional square 2D heatmap with proper labels and strategy markers."""
     (
         pivot_table,
         display_values,
@@ -161,8 +227,11 @@ def plot_2d_heatmap(
         hover_text,
     )
 
-    _update_heatmap_layout(fig, title, x_label, y_label, x)
-    st.plotly_chart(fig, use_container_width=True)
+    if strategy_markers:
+        _add_strategy_markers(fig, strategy_markers, x, y)
+
+    _update_heatmap_layout(fig, title, x_label, y_label, x, y)
+    st.plotly_chart(fig, width="stretch")
 
 
 def _get_label(param: str) -> str:
@@ -180,8 +249,8 @@ def _get_label(param: str) -> str:
 
 def _format_param_value(param: str, value: float) -> str:
     """Format parameter value for display."""
-    if param == "rebalance_rate":
-        return f"{value:.3f}"
+    if param in PERCENTAGE_PARAMS:
+        return f"{value:.1%}"
     else:
         return f"{value:.2f}"
 
