@@ -8,7 +8,8 @@ A Streamlit application for analyzing and optimizing two-asset portfolio rebalan
 
 ## Screenshot
 
-![SPY vs GLD Portfolio Analysis App](app_screenshot.png)
+<img width="1708" height="807" alt="image" src="https://github.com/user-attachments/assets/2a0e4c1e-d5c5-4b90-afb6-f4b15f94a4ee" />
+
 
 ## Features
 
