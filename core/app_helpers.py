@@ -19,7 +19,9 @@ def run_strategy_with_metrics(
     starting_cash: float,
 ) -> tuple[pd.DataFrame, dict]:
     """Run strategy and calculate metrics in one call."""
-    result = run_strategy(data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    result = run_strategy(
+        data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+    )
     metrics = calculate_metrics(
         result["total_cash_value"].values,
         data.index[0],
@@ -30,9 +32,9 @@ def run_strategy_with_metrics(
 
 
 @st.cache_data
-def load_data_and_search():
+def load_data_and_search(period: str = "10yr"):
     """Load data and run grid search (cached for performance)."""
-    data = get_two_series()
+    data = get_two_series(period=period)
     grid_results = run_grid_search(data)
     return data, grid_results
 
