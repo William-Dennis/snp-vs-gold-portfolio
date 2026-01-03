@@ -82,7 +82,7 @@ def render_performance_chart(data, strategy_result):
     normalized_data["Your Strategy"] = (
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
-    plot_all_columns(normalized_data, title="", height=800)
+    plot_all_columns(normalized_data, title="", y_label="Normalised Price", height=800)
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):
