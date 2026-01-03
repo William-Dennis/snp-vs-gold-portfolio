@@ -120,6 +120,16 @@ def _get_label(param: str) -> str:
     return labels.get(param, param)
 
 
+def _format_param_value(param: str, value: float) -> str:
+    """Format parameter value for display."""
+    if param == "rebalance_rate":
+        return f"{value:.3f}"
+    elif param == "t1_ratio":
+        return f"{value:.2f}"
+    else:
+        return f"{value:.2f}"
+
+
 def _format_value(metric: str, value: float) -> str:
     """Format value based on metric type."""
     if metric in ["cagr", "max_drawdown"]:
@@ -145,8 +155,8 @@ def _create_hover_text(
         row = []
         for j, x_val in enumerate(pivot_table.columns):
             # Format parameter values
-            x_formatted = f"{x_val:.3f}" if x == "rebalance_rate" else f"{x_val:.2f}"
-            y_formatted = f"{y_val:.2f}"
+            x_formatted = _format_param_value(x, x_val)
+            y_formatted = _format_param_value(y, y_val)
 
             # Format metric value
             if use_relative:

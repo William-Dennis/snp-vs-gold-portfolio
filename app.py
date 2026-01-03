@@ -16,6 +16,20 @@ Adjust your strategy parameters and compare against grid search results.
 """)
 
 
+def run_strategy_with_metrics(
+    data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+):
+    """Run strategy and calculate metrics in one call."""
+    result = run_strategy(data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    metrics = calculate_metrics(
+        result["total_cash_value"].values,
+        data.index[0],
+        data.index[-1],
+        int(np.sum(result["rebalance"] != 0)),
+    )
+    return result, metrics
+
+
 # Load data and run grid search (cached for performance)
 @st.cache_data
 def load_data_and_search():
@@ -85,26 +99,13 @@ with col2:
 use_relative = st.toggle("Show Relative Metrics", value=False)
 
 # Run strategy
-strategy_result = run_strategy(
-    data,
-    ticker1="SPY",
-    ticker2="GLD",
-    t1_ratio=strategy_t1_ratio,
-    rebalance_rate=strategy_rebalance,
-    starting_cash=10_000,
-)
-
-strategy_metrics = calculate_metrics(
-    strategy_result["total_cash_value"].values,
-    data.index[0],
-    data.index[-1],
-    int(np.sum(strategy_result["rebalance"] != 0)),
+strategy_result, strategy_metrics = run_strategy_with_metrics(
+    data, "SPY", "GLD", strategy_t1_ratio, strategy_rebalance, 10_000
 )
 
 # Calculate SPY and GLD metrics
-spy_metrics = calculate_metrics(data["SPY"].values, data.index[0], data.index[-1], 0)
-
-gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1], 0)
+_, spy_metrics = run_strategy_with_metrics(data, "SPY", "SPY", 1.0, 0.0, 10_000)
+_, gld_metrics = run_strategy_with_metrics(data, "GLD", "GLD", 1.0, 0.0, 10_000)
 
 # Combined performance chart
 st.subheader("Performance Comparison")
@@ -119,49 +120,16 @@ plot_all_columns(normalized_data, title="", height=800)
 st.subheader("Performance Metrics")
 
 # Calculate metrics for the 3 best strategies from grid search
-best_sharpe_result = run_strategy(
-    data,
-    ticker1="SPY",
-    ticker2="GLD",
-    t1_ratio=float(best_sharpe["t1_ratio"]),
-    rebalance_rate=float(best_sharpe["rebalance_rate"]),
-    starting_cash=10_000,
-)
-best_sharpe_metrics = calculate_metrics(
-    best_sharpe_result["total_cash_value"].values,
-    data.index[0],
-    data.index[-1],
-    int(np.sum(best_sharpe_result["rebalance"] != 0)),
+best_sharpe_result, best_sharpe_metrics = run_strategy_with_metrics(
+    data, "SPY", "GLD", float(best_sharpe["t1_ratio"]), float(best_sharpe["rebalance_rate"]), 10_000
 )
 
-best_cagr_result = run_strategy(
-    data,
-    ticker1="SPY",
-    ticker2="GLD",
-    t1_ratio=float(best_cagr["t1_ratio"]),
-    rebalance_rate=float(best_cagr["rebalance_rate"]),
-    starting_cash=10_000,
-)
-best_cagr_metrics = calculate_metrics(
-    best_cagr_result["total_cash_value"].values,
-    data.index[0],
-    data.index[-1],
-    int(np.sum(best_cagr_result["rebalance"] != 0)),
+best_cagr_result, best_cagr_metrics = run_strategy_with_metrics(
+    data, "SPY", "GLD", float(best_cagr["t1_ratio"]), float(best_cagr["rebalance_rate"]), 10_000
 )
 
-best_drawdown_result = run_strategy(
-    data,
-    ticker1="SPY",
-    ticker2="GLD",
-    t1_ratio=float(best_drawdown["t1_ratio"]),
-    rebalance_rate=float(best_drawdown["rebalance_rate"]),
-    starting_cash=10_000,
-)
-best_drawdown_metrics = calculate_metrics(
-    best_drawdown_result["total_cash_value"].values,
-    data.index[0],
-    data.index[-1],
-    int(np.sum(best_drawdown_result["rebalance"] != 0)),
+best_drawdown_result, best_drawdown_metrics = run_strategy_with_metrics(
+    data, "SPY", "GLD", float(best_drawdown["t1_ratio"]), float(best_drawdown["rebalance_rate"]), 10_000
 )
 
 # Updated metrics DataFrame including the 3 strategies
@@ -245,46 +213,23 @@ st.subheader("Grid Search Results")
 
 metrics = ["sharpe", "cagr", "max_drawdown", "num_rebalances"]
 
-# First row
-col1, col2 = st.columns(2)
-with col1:
-    plot_2d_heatmap(
-        grid_search_data,
-        "rebalance_rate",
-        "t1_ratio",
-        metrics[0],
-        baseline_value=strategy_metrics[metrics[0]],
-        use_relative=use_relative,
-    )
-
-with col2:
-    plot_2d_heatmap(
-        grid_search_data,
-        "rebalance_rate",
-        "t1_ratio",
-        metrics[1],
-        baseline_value=strategy_metrics[metrics[1]],
-        use_relative=use_relative,
-    )
-
-# Second row
-col1, col2 = st.columns(2)
-with col1:
-    plot_2d_heatmap(
-        grid_search_data,
-        "rebalance_rate",
-        "t1_ratio",
-        metrics[2],
-        baseline_value=strategy_metrics[metrics[2]],
-        use_relative=use_relative,
-    )
-
-with col2:
-    plot_2d_heatmap(
-        grid_search_data,
-        "rebalance_rate",
-        "t1_ratio",
-        metrics[3],
-        baseline_value=strategy_metrics[metrics[3]],
-        use_relative=use_relative,
-    )
+for i in range(0, len(metrics), 2):
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_2d_heatmap(
+            grid_search_data,
+            "rebalance_rate",
+            "t1_ratio",
+            metrics[i],
+            baseline_value=strategy_metrics[metrics[i]],
+            use_relative=use_relative,
+        )
+    with col2:
+        plot_2d_heatmap(
+            grid_search_data,
+            "rebalance_rate",
+            "t1_ratio",
+            metrics[i + 1],
+            baseline_value=strategy_metrics[metrics[i + 1]],
+            use_relative=use_relative,
+        )
