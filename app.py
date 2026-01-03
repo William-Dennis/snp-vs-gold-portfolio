@@ -17,8 +17,13 @@ Adjust your strategy parameters and compare against grid search results.
 
 
 def run_strategy_with_metrics(
-    data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
-):
+    data: pd.DataFrame,
+    ticker1: str,
+    ticker2: str,
+    t1_ratio: float,
+    rebalance_rate: float,
+    starting_cash: float,
+) -> tuple[pd.DataFrame, dict]:
     """Run strategy and calculate metrics in one call."""
     result = run_strategy(data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
     metrics = calculate_metrics(

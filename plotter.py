@@ -124,8 +124,6 @@ def _format_param_value(param: str, value: float) -> str:
     """Format parameter value for display."""
     if param == "rebalance_rate":
         return f"{value:.3f}"
-    elif param == "t1_ratio":
-        return f"{value:.2f}"
     else:
         return f"{value:.2f}"
 
