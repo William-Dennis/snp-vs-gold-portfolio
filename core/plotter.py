@@ -4,6 +4,9 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
+# Parameters that should be displayed as percentages
+PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
+
 
 def plot_all_columns(
     df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
@@ -113,7 +116,7 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
         xaxis=dict(
             title=x_label,
             side="bottom",
-            tickformat=".1%" if x in ["rebalance_rate", "t1_ratio"] else ".2f",
+            tickformat=".1%" if x in PERCENTAGE_PARAMS else ".2f",
         ),
         yaxis=dict(
             title=y_label,
@@ -180,9 +183,7 @@ def _get_label(param: str) -> str:
 
 def _format_param_value(param: str, value: float) -> str:
     """Format parameter value for display."""
-    if param == "rebalance_rate":
-        return f"{value:.1%}"
-    elif param == "t1_ratio":
+    if param in PERCENTAGE_PARAMS:
         return f"{value:.1%}"
     else:
         return f"{value:.2f}"
