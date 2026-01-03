@@ -38,11 +38,8 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
 
 
 def _initialize_session_state():
-    """Initialize session state for sliders."""
-    if "t1_slider" not in st.session_state:
-        st.session_state.t1_slider = 50.0  # 50%
-    if "rebalance_slider" not in st.session_state:
-        st.session_state.rebalance_slider = 1.0  # 1.0%
+    """Initialize session."""
+    pass
 
 
 def _render_sliders(col1, col2):
