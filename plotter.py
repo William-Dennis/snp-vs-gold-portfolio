@@ -3,8 +3,9 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
-def plot_all_columns(df: pd.DataFrame, x_label="Date", y_label="Price", 
-                    title="", height=800):
+def plot_all_columns(
+    df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
+):
     """Plot all numeric columns as line charts."""
     fig = go.Figure()
 
@@ -25,8 +26,14 @@ def plot_all_columns(df: pd.DataFrame, x_label="Date", y_label="Price",
     st.plotly_chart(fig, use_container_width=True)
 
 
-def plot_2d_heatmap(df: pd.DataFrame, x: str, y: str, z: str,
-                   baseline_value: float = None, use_relative: bool = False):
+def plot_2d_heatmap(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    z: str,
+    baseline_value: float = None,
+    use_relative: bool = False,
+):
     """Plot professional square 2D heatmap with proper labels."""
     pivot_table = df.pivot(index=y, columns=x, values=z).sort_index().sort_index(axis=1)
 
@@ -37,7 +44,7 @@ def plot_2d_heatmap(df: pd.DataFrame, x: str, y: str, z: str,
     x_label = _get_label(x)
     y_label = _get_label(y)
     z_label = _get_label(z)
-    
+
     # Calculate display values and title
     if use_relative and baseline_value is not None:
         display_values = _calc_relative(pivot_table.values, baseline_value)
@@ -125,27 +132,29 @@ def _format_value(metric: str, value: float) -> str:
         return f"{value:.4f}"
 
 
-def _create_hover_text(pivot_table, x, y, z, display_values, use_relative, value_suffix):
+def _create_hover_text(
+    pivot_table, x, y, z, display_values, use_relative, value_suffix
+):
     """Create formatted hover text for each heatmap cell."""
     hover_text = []
     x_label = _get_label(x)
     y_label = _get_label(y)
     z_label = _get_label(z)
-    
+
     for i, y_val in enumerate(pivot_table.index):
         row = []
         for j, x_val in enumerate(pivot_table.columns):
             # Format parameter values
             x_formatted = f"{x_val:.3f}" if x == "rebalance_rate" else f"{x_val:.2f}"
             y_formatted = f"{y_val:.2f}"
-            
+
             # Format metric value
             if use_relative:
                 z_formatted = f"{display_values[i, j]:+.2f}{value_suffix}"
             else:
                 original_val = pivot_table.iloc[i, j]
                 z_formatted = _format_value(z, original_val)
-            
+
             hover = (
                 f"<b>{x_label}:</b> {x_formatted}<br>"
                 f"<b>{y_label}:</b> {y_formatted}<br>"
@@ -153,7 +162,7 @@ def _create_hover_text(pivot_table, x, y, z, display_values, use_relative, value
             )
             row.append(hover)
         hover_text.append(row)
-    
+
     return hover_text
 
 
