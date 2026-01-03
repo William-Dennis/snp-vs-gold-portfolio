@@ -208,16 +208,6 @@ def render_heatmaps(grid_search_data, strategy_metrics, use_relative, strategy_t
             "rebalance_rate": float(best_drawdown["rebalance_rate"]),
             "t1_ratio": float(best_drawdown["t1_ratio"]),
         },
-        {
-            "name": "SPY Only",
-            "rebalance_rate": 0.0,
-            "t1_ratio": 1.0,
-        },
-        {
-            "name": "GLD Only",
-            "rebalance_rate": 0.0,
-            "t1_ratio": 0.0,
-        },
     ]
 
     metrics = ["sharpe", "cagr", "max_drawdown", "num_rebalances"]

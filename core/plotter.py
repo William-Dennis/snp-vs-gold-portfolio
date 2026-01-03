@@ -11,8 +11,6 @@ MARKER_COLORS = {
     "Max Sharpe Strategy": "#4ECDC4",
     "Max CAGR Strategy": "#FFD93D",
     "Min Drawdown Strategy": "#95E1D3",
-    "SPY Only": "#A8E6CF",
-    "GLD Only": "#C7CEEA",
 }
 
 MARKER_SYMBOLS = {
@@ -20,8 +18,6 @@ MARKER_SYMBOLS = {
     "Max Sharpe Strategy": "diamond",
     "Max CAGR Strategy": "square",
     "Min Drawdown Strategy": "circle",
-    "SPY Only": "triangle-up",
-    "GLD Only": "triangle-down",
 }
 
 
@@ -103,7 +99,7 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
     fig.update_layout(
         title=dict(text=title, x=0.5, xanchor="center"),
         height=600,
-        margin=dict(l=60, r=60, b=60, t=80),
+        margin=dict(l=60, r=60, b=120, t=80),
         xaxis=dict(
             title=x_label,
             side="bottom",
@@ -113,6 +109,13 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
             title=y_label,
             autorange="reversed",
             tickformat=".2f",
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.15,
+            xanchor="center",
+            x=0.5,
         ),
         font=dict(size=12),
     )
