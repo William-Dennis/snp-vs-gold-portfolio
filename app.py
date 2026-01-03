@@ -51,6 +51,8 @@ best_sharpe_result, best_sharpe_metrics = run_strategy_with_metrics(
     float(best_sharpe["rebalance_rate"]), 10_000
 )
 
+plot_all_columns(normalized_data, title="", height=600)
+
 best_cagr_result, best_cagr_metrics = run_strategy_with_metrics(
     data, "SPY", "GLD", float(best_cagr["t1_ratio"]), 
     float(best_cagr["rebalance_rate"]), 10_000
