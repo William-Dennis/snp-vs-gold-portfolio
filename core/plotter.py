@@ -107,7 +107,7 @@ def _create_heatmap_figure(
     )
 
 
-def _update_heatmap_layout(fig, title, x_label, y_label, x):
+def _update_heatmap_layout(fig, title, x_label, y_label, x, y):
     """Update heatmap figure layout."""
     fig.update_layout(
         title=dict(text=title, x=0.5, xanchor="center"),
@@ -121,7 +121,7 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
         yaxis=dict(
             title=y_label,
             autorange="reversed",
-            tickformat=".1%",
+            tickformat=".1%" if y in PERCENTAGE_PARAMS else ".2f",
         ),
         font=dict(size=12),
     )
@@ -164,7 +164,7 @@ def plot_2d_heatmap(
         hover_text,
     )
 
-    _update_heatmap_layout(fig, title, x_label, y_label, x)
+    _update_heatmap_layout(fig, title, x_label, y_label, x, y)
     st.plotly_chart(fig, use_container_width=True)
 
 
