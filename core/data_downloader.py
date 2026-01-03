@@ -1,3 +1,5 @@
+"""Data downloading and processing utilities."""
+
 import yfinance as yf
 import pandas as pd
 import streamlit as st
