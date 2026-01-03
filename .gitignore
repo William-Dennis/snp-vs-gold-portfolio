@@ -1,3 +1,5 @@
+*.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -60,6 +62,9 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+
+# Cache database files
+*.db
 
 # Flask stuff:
 instance/

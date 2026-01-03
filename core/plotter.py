@@ -4,6 +4,9 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
+# Parameters that should be displayed as percentages
+PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
+
 
 def plot_all_columns(
     df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
@@ -95,7 +98,7 @@ def _create_heatmap_figure(
             colorscale=colorscale,
             zmid=zmid,
             colorbar=dict(
-                title=colorbar_title,
+                title=dict(text=colorbar_title, side="right"),
                 ticksuffix=value_suffix if use_relative else "",
             ),
             text=hover_text,
@@ -104,7 +107,7 @@ def _create_heatmap_figure(
     )
 
 
-def _update_heatmap_layout(fig, title, x_label, y_label, x):
+def _update_heatmap_layout(fig, title, x_label, y_label, x, y):
     """Update heatmap figure layout."""
     fig.update_layout(
         title=dict(text=title, x=0.5, xanchor="center"),
@@ -113,12 +116,12 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
         xaxis=dict(
             title=x_label,
             side="bottom",
-            tickformat=".3f" if x == "rebalance_rate" else ".2f",
+            tickformat=".1%" if x in PERCENTAGE_PARAMS else ".2f",
         ),
         yaxis=dict(
             title=y_label,
             autorange="reversed",
-            tickformat=".2f",
+            tickformat=".1%" if y in PERCENTAGE_PARAMS else ".2f",
         ),
         font=dict(size=12),
     )
@@ -161,7 +164,7 @@ def plot_2d_heatmap(
         hover_text,
     )
 
-    _update_heatmap_layout(fig, title, x_label, y_label, x)
+    _update_heatmap_layout(fig, title, x_label, y_label, x, y)
     st.plotly_chart(fig, width='stretch')
 
 
@@ -180,8 +183,8 @@ def _get_label(param: str) -> str:
 
 def _format_param_value(param: str, value: float) -> str:
     """Format parameter value for display."""
-    if param == "rebalance_rate":
-        return f"{value:.3f}"
+    if param in PERCENTAGE_PARAMS:
+        return f"{value:.1%}"
     else:
         return f"{value:.2f}"
 
