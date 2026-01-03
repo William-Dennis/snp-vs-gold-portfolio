@@ -57,7 +57,7 @@ def _render_sliders(col1, col2):
         strategy_rebalance_pct = st.slider(
             "Rebalance Threshold",
             min_value=0.0,
-            max_value=10.0,
+            max_value=11.0,
             value=st.session_state.rebalance_slider,
             step=0.1,
             format="%.1f%%",
