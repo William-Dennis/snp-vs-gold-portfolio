@@ -53,7 +53,7 @@ def plot_all_columns(
             )
         )
 
-    if rebalance_dates is not None and len(rebalance_dates) > 0:
+    if rebalance_dates:
         for date in rebalance_dates:
             fig.add_shape(
                 type="line",
