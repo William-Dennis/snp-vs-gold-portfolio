@@ -104,7 +104,7 @@ def render_performance_chart(data, strategy_result):
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
 
-    rebalance_dates = strategy_result[strategy_result["rebalance"] != 0].index.tolist()
+    rebalance_dates = strategy_result.index[strategy_result["rebalance"] != 0].tolist()
 
     plot_all_columns(
         normalized_data,
