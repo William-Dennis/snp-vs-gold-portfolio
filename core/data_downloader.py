@@ -49,6 +49,11 @@ def get_two_series(ticker1: str = "SPY", ticker2: str = "GLD", period: str = "10
     s1 = get_daily_data(ticker1, start_date)
     s2 = get_daily_data(ticker2, start_date)
     
+    # Check if we have any data
+    if len(s1) == 0 or len(s2) == 0:
+        st.error(f"Error: No data available for {ticker1 if len(s1) == 0 else ticker2} in the period {period}")
+        st.stop()
+    
     # Check if we have sufficient data
     min_required_days = AVAILABLE_PERIODS[period] * 252  # Approximate trading days per year
     if len(s1) < min_required_days * 0.8 or len(s2) < min_required_days * 0.8:
