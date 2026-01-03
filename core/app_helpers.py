@@ -19,7 +19,9 @@ def run_strategy_with_metrics(
     starting_cash: float,
 ) -> tuple[pd.DataFrame, dict]:
     """Run strategy and calculate metrics in one call."""
-    result = run_strategy(data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    result = run_strategy(
+        data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+    )
     metrics = calculate_metrics(
         result["total_cash_value"].values,
         data.index[0],
@@ -44,5 +46,7 @@ def get_best_strategies(grid_search_data: pd.DataFrame) -> dict:
         "cagr": grid_search_data.nlargest(1, "cagr").iloc[0],
         "drawdown": grid_search_data.nlargest(1, "max_drawdown").iloc[0],
         "weekly_drawdown": grid_search_data.nlargest(1, "max_weekly_drawdown").iloc[0],
-        "monthly_drawdown": grid_search_data.nlargest(1, "max_monthly_drawdown").iloc[0],
+        "monthly_drawdown": grid_search_data.nlargest(1, "max_monthly_drawdown").iloc[
+            0
+        ],
     }

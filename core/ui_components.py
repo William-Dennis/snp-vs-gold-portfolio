@@ -3,14 +3,15 @@
 import streamlit as st
 import pandas as pd
 
-from .app_helpers import run_strategy_with_metrics
 from .plotter import plot_2d_heatmap, plot_all_columns
 
 
-def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown):
+def _render_preset_buttons(
+    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown
+):
     """Render preset strategy buttons."""
     col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
-    
+
     with col3:
         if st.button("Max Sharpe Strategy", use_container_width=True):
             st.session_state.t1_slider = float(best_sharpe["t1_ratio"])
@@ -32,15 +33,19 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown, best_weekly_dr
     with col6:
         if st.button("Min Weekly Drawdown", use_container_width=True):
             st.session_state.t1_slider = float(best_weekly_drawdown["t1_ratio"])
-            st.session_state.rebalance_slider = float(best_weekly_drawdown["rebalance_rate"])
+            st.session_state.rebalance_slider = float(
+                best_weekly_drawdown["rebalance_rate"]
+            )
             st.rerun()
 
     with col7:
         if st.button("Min Monthly Drawdown", use_container_width=True):
             st.session_state.t1_slider = float(best_monthly_drawdown["t1_ratio"])
-            st.session_state.rebalance_slider = float(best_monthly_drawdown["rebalance_rate"])
+            st.session_state.rebalance_slider = float(
+                best_monthly_drawdown["rebalance_rate"]
+            )
             st.rerun()
-    
+
     return col1, col2
 
 
@@ -76,14 +81,22 @@ def _render_sliders(col1, col2):
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
         )
-    
+
     return strategy_t1_ratio, strategy_rebalance
 
 
-def render_strategy_controls(best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown):
+def render_strategy_controls(
+    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown
+):
     """Render strategy configuration controls."""
     _initialize_session_state()
-    col1, col2 = _render_preset_buttons(best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown)
+    col1, col2 = _render_preset_buttons(
+        best_sharpe,
+        best_cagr,
+        best_drawdown,
+        best_weekly_drawdown,
+        best_monthly_drawdown,
+    )
     return _render_sliders(col1, col2)
 
 
@@ -95,10 +108,17 @@ def render_performance_chart(data, strategy_result):
     normalized_data["Your Strategy"] = (
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
-    plot_all_columns(normalized_data, title="", height=800)
+    plot_all_columns(normalized_data, title="", y_label="Normalised Price", height=800)
 
 
-def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown):
+def _get_allocation_values(
+    strategy_t1_ratio,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+    best_weekly_drawdown,
+    best_monthly_drawdown,
+):
     """Get SPY allocation values for all strategies."""
     return [
         strategy_t1_ratio,
@@ -112,7 +132,14 @@ def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawd
     ]
 
 
-def _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown):
+def _get_rebalance_values(
+    strategy_rebalance,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+    best_weekly_drawdown,
+    best_monthly_drawdown,
+):
     """Get rebalance threshold values for all strategies."""
     return [
         strategy_rebalance,
@@ -126,7 +153,17 @@ def _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawd
     ]
 
 
-def _get_metric_values(metric_key, strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics):
+def _get_metric_values(
+    metric_key,
+    strategy_metrics,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+    best_weekly_drawdown,
+    best_monthly_drawdown,
+    spy_metrics,
+    gld_metrics,
+):
     """Get metric values for all strategies."""
     return [
         strategy_metrics[metric_key],
@@ -141,26 +178,112 @@ def _get_metric_values(metric_key, strategy_metrics, best_sharpe, best_cagr, bes
 
 
 def _create_metrics_dataframe(
-    strategy_t1_ratio, strategy_rebalance, strategy_metrics,
-    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown,
-    spy_metrics, gld_metrics
+    strategy_t1_ratio,
+    strategy_rebalance,
+    strategy_metrics,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+    best_weekly_drawdown,
+    best_monthly_drawdown,
+    spy_metrics,
+    gld_metrics,
 ):
     """Create metrics comparison dataframe."""
     return pd.DataFrame(
         {
             "Strategy": [
-                "Your Strategy", "Max Sharpe Strategy", "Max CAGR Strategy",
-                "Min Drawdown Strategy", "Min Weekly Drawdown", "Min Monthly Drawdown",
-                "SPY Only", "GLD Only",
+                "Your Strategy",
+                "Max Sharpe Strategy",
+                "Max CAGR Strategy",
+                "Min Drawdown Strategy",
+                "Min Weekly Drawdown",
+                "Min Monthly Drawdown",
+                "SPY Only",
+                "GLD Only",
             ],
-            "SPY Allocation": _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown),
-            "Rebalance Threshold": _get_rebalance_values(strategy_rebalance, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown),
-            "Sharpe": _get_metric_values("sharpe", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
-            "CAGR": _get_metric_values("cagr", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
-            "Max Drawdown": _get_metric_values("max_drawdown", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
-            "Max Weekly Drawdown": _get_metric_values("max_weekly_drawdown", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
-            "Max Monthly Drawdown": _get_metric_values("max_monthly_drawdown", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
-            "Rebalances": _get_metric_values("num_rebalances", strategy_metrics, best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown, spy_metrics, gld_metrics),
+            "SPY Allocation": _get_allocation_values(
+                strategy_t1_ratio,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+            ),
+            "Rebalance Threshold": _get_rebalance_values(
+                strategy_rebalance,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+            ),
+            "Sharpe": _get_metric_values(
+                "sharpe",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
+            "CAGR": _get_metric_values(
+                "cagr",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
+            "Max Drawdown": _get_metric_values(
+                "max_drawdown",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
+            "Max Weekly Drawdown": _get_metric_values(
+                "max_weekly_drawdown",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
+            "Max Monthly Drawdown": _get_metric_values(
+                "max_monthly_drawdown",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
+            "Rebalances": _get_metric_values(
+                "num_rebalances",
+                strategy_metrics,
+                best_sharpe,
+                best_cagr,
+                best_drawdown,
+                best_weekly_drawdown,
+                best_monthly_drawdown,
+                spy_metrics,
+                gld_metrics,
+            ),
         }
     )
 
@@ -193,13 +316,20 @@ def render_metrics_table(
 ):
     """Render the metrics comparison table."""
     st.subheader("Performance Metrics")
-    
+
     metrics_df = _create_metrics_dataframe(
-        strategy_t1_ratio, strategy_rebalance, strategy_metrics,
-        best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown,
-        spy_metrics, gld_metrics
+        strategy_t1_ratio,
+        strategy_rebalance,
+        strategy_metrics,
+        best_sharpe,
+        best_cagr,
+        best_drawdown,
+        best_weekly_drawdown,
+        best_monthly_drawdown,
+        spy_metrics,
+        gld_metrics,
     )
-    
+
     st.dataframe(
         metrics_df.style.format(_get_format_spec()),
         use_container_width=True,
@@ -211,7 +341,14 @@ def render_heatmaps(grid_search_data, strategy_metrics, use_relative):
     """Render the grid search heatmaps."""
     st.subheader("Grid Search Results")
 
-    metrics = ["sharpe", "cagr", "max_drawdown", "num_rebalances", "max_weekly_drawdown", "max_monthly_drawdown"]
+    metrics = [
+        "sharpe",
+        "cagr",
+        "max_drawdown",
+        "num_rebalances",
+        "max_weekly_drawdown",
+        "max_monthly_drawdown",
+    ]
 
     for i in range(0, len(metrics), 2):
         col1, col2 = st.columns(2)

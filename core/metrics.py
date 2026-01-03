@@ -29,14 +29,14 @@ def calculate_max_drawdown(series: pd.Series) -> float:
 def calculate_max_weekly_drawdown(series: pd.Series) -> float:
     """Calculate maximum weekly drawdown."""
     # Resample to weekly frequency, taking the last value of each week
-    weekly_series = series.resample('W').last()
+    weekly_series = series.resample("W").last()
     return calculate_max_drawdown(weekly_series)
 
 
 def calculate_max_monthly_drawdown(series: pd.Series) -> float:
     """Calculate maximum monthly drawdown."""
     # Resample to monthly frequency, taking the last value of each month
-    monthly_series = series.resample('ME').last()
+    monthly_series = series.resample("ME").last()
     return calculate_max_drawdown(monthly_series)
 
 

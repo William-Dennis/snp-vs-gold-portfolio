@@ -4,7 +4,11 @@ import streamlit as st
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 
-from core.app_helpers import load_data_and_search, run_strategy_with_metrics, get_best_strategies
+from core.app_helpers import (
+    load_data_and_search,
+    run_strategy_with_metrics,
+    get_best_strategies,
+)
 from core.metrics import calculate_metrics
 from core.ui_components import (
     render_strategy_controls,
@@ -52,9 +56,16 @@ gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1
 render_performance_chart(data, strategy_result)
 
 render_metrics_table(
-    strategy_t1_ratio, strategy_rebalance, strategy_metrics,
-    best_sharpe, best_cagr, best_drawdown, best_weekly_drawdown, best_monthly_drawdown,
-    spy_metrics, gld_metrics
+    strategy_t1_ratio,
+    strategy_rebalance,
+    strategy_metrics,
+    best_sharpe,
+    best_cagr,
+    best_drawdown,
+    best_weekly_drawdown,
+    best_monthly_drawdown,
+    spy_metrics,
+    gld_metrics,
 )
 
 render_heatmaps(grid_search_data, strategy_metrics, use_relative)
