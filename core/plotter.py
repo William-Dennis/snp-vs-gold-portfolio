@@ -20,6 +20,13 @@ MARKER_SYMBOLS = {
     "Min Drawdown Strategy": "circle",
 }
 
+# Line chart colors
+LINE_CHART_COLORS = {
+    "SPY": "#00008B",  # Deep Blue
+    "GLD": "#FFD700",  # Gold
+    "Your Strategy": "#FF6B6B",  # Red (consistent with marker colors)
+}
+
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
@@ -31,15 +38,10 @@ def plot_all_columns(
     title="",
     height=800,
     rebalance_dates=None,
+    rebalance_amounts=None,
 ):
     """Plot all numeric columns as line charts with optional rebalancing markers."""
     fig = go.Figure()
-
-    color_map = {
-        "SPY": "#1f77b4",  # Blue
-        "GLD": "#FFD700",  # Gold
-        "Your Strategy": "#FF6B6B",  # Red (consistent with marker colors)
-    }
 
     for col in df.select_dtypes(include="number").columns:
         series = df[col]
@@ -49,12 +51,19 @@ def plot_all_columns(
                 y=series.values,
                 mode="lines",
                 name=col,
-                line=dict(color=color_map.get(col)),
+                line=dict(color=LINE_CHART_COLORS.get(col)),
             )
         )
 
-    if rebalance_dates:
-        for date in rebalance_dates:
+    if rebalance_dates and rebalance_amounts:
+        for date, amount in zip(rebalance_dates, rebalance_amounts):
+            # Positive amount: selling SPY (blue) to buy GLD
+            # Negative amount: selling GLD to buy SPY (blue)
+            if amount > 0:
+                color = LINE_CHART_COLORS["GLD"]  # Buying GLD
+            else:
+                color = LINE_CHART_COLORS["SPY"]  # Buying SPY
+
             fig.add_shape(
                 type="line",
                 x0=date,
@@ -62,7 +71,7 @@ def plot_all_columns(
                 y0=0,
                 y1=1,
                 yref="paper",
-                line=dict(color="rgba(128, 128, 128, 0.3)", width=1, dash="dot"),
+                line=dict(color=color, width=2, dash="dot"),
             )
 
     fig.update_layout(

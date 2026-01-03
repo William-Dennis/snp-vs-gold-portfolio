@@ -14,6 +14,7 @@ from core.ui_components import (
     render_performance_chart,
     render_metrics_table,
     render_heatmaps,
+    render_settings,
     _initialize_session_state,
 )
 from core.data_downloader import AVAILABLE_PERIODS
@@ -23,6 +24,9 @@ st.title("SPY vs GLD Portfolio Analysis")
 
 # Initialize session state
 _initialize_session_state()
+
+# Render settings in sidebar
+render_settings()
 
 st.markdown("""
 Explore optimal rebalancing strategies for a two-asset portfolio.

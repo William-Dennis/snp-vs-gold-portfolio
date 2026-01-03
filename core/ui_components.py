@@ -75,14 +75,14 @@ def _render_sliders(col1, col2):
 
 def render_strategy_controls(best_sharpe, best_cagr, best_drawdown):
     """Render strategy configuration controls."""
-    _initialize_session_state()
     col1, col2 = _render_preset_buttons(best_sharpe, best_cagr, best_drawdown)
     return _render_sliders(col1, col2)
 
 
 def render_settings():
-    """Render settings button and advanced options."""
-    with st.popover("⚙️", help="Advanced Settings"):
+    """Render settings in sidebar with advanced options."""
+    with st.sidebar:
+        st.markdown("### ⚙️ Settings")
         st.checkbox(
             "Show Rebalancing Lines",
             value=st.session_state.show_rebalance_lines,
@@ -93,18 +93,16 @@ def render_settings():
 
 def render_performance_chart(data, strategy_result):
     """Render the combined performance comparison chart."""
-    col1, col2 = st.columns([6, 1])
-    with col1:
-        st.subheader("Performance Comparison")
-    with col2:
-        render_settings()
+    st.subheader("Performance Comparison")
 
     normalized_data = data.copy()
     normalized_data["Your Strategy"] = (
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
 
-    rebalance_dates = strategy_result.index[strategy_result["rebalance"] != 0].tolist()
+    rebalance_mask = strategy_result["rebalance"] != 0
+    rebalance_dates = strategy_result.index[rebalance_mask].tolist()
+    rebalance_amounts = strategy_result.loc[rebalance_mask, "rebalance"].tolist()
 
     plot_all_columns(
         normalized_data,
@@ -112,6 +110,9 @@ def render_performance_chart(data, strategy_result):
         y_label="Normalised Price",
         height=800,
         rebalance_dates=rebalance_dates
+        if st.session_state.show_rebalance_lines
+        else None,
+        rebalance_amounts=rebalance_amounts
         if st.session_state.show_rebalance_lines
         else None,
     )
