@@ -51,8 +51,8 @@ def _render_sliders(col1, col2):
         strategy_t1_ratio_pct = st.slider(
             "SPY Allocation",
             min_value=0.0,
-            max_value=1.0,
-            step=0.01,
+            max_value=100.0,
+            step=1.0,
             format="%.1f%%",
             key="t1_slider",
         )
@@ -61,9 +61,9 @@ def _render_sliders(col1, col2):
     with col2:
         strategy_rebalance_pct = st.slider(
             "Rebalance Threshold",
-            min_value=0.01,
-            max_value=0.11,
-            step=0.001,
+            min_value=1.0,
+            max_value=11.0,
+            step=0.1,
             format="%.1f%%",
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
