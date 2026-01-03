@@ -87,12 +87,12 @@ def _update_heatmap_layout(fig, title, x_label, y_label, x):
         xaxis=dict(
             title=x_label,
             side="bottom",
-            tickformat=".3f" if x == "rebalance_rate" else ".2f",
+            tickformat=".1%" if x in ["rebalance_rate", "t1_ratio"] else ".2f",
         ),
         yaxis=dict(
             title=y_label,
             autorange="reversed",
-            tickformat=".2f",
+            tickformat=".1%",
         ),
         font=dict(size=12),
     )
@@ -139,7 +139,9 @@ def _get_label(param: str) -> str:
 def _format_param_value(param: str, value: float) -> str:
     """Format parameter value for display."""
     if param == "rebalance_rate":
-        return f"{value:.3f}"
+        return f"{value:.1%}"
+    elif param == "t1_ratio":
+        return f"{value:.1%}"
     else:
         return f"{value:.2f}"
 

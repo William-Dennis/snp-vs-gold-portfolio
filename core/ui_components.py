@@ -13,20 +13,20 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
     
     with col3:
         if st.button("Max Sharpe Strategy", use_container_width=True):
-            st.session_state.t1_slider = float(best_sharpe["t1_ratio"])
-            st.session_state.rebalance_slider = float(best_sharpe["rebalance_rate"])
+            st.session_state.t1_slider = float(best_sharpe["t1_ratio"]) * 100.0
+            st.session_state.rebalance_slider = float(best_sharpe["rebalance_rate"]) * 100.0
             st.rerun()
 
     with col4:
         if st.button("Max CAGR Strategy", use_container_width=True):
-            st.session_state.t1_slider = float(best_cagr["t1_ratio"])
-            st.session_state.rebalance_slider = float(best_cagr["rebalance_rate"])
+            st.session_state.t1_slider = float(best_cagr["t1_ratio"]) * 100.0
+            st.session_state.rebalance_slider = float(best_cagr["rebalance_rate"]) * 100.0
             st.rerun()
 
     with col5:
         if st.button("Min Drawdown Strategy", use_container_width=True):
-            st.session_state.t1_slider = float(best_drawdown["t1_ratio"])
-            st.session_state.rebalance_slider = float(best_drawdown["rebalance_rate"])
+            st.session_state.t1_slider = float(best_drawdown["t1_ratio"]) * 100.0
+            st.session_state.rebalance_slider = float(best_drawdown["rebalance_rate"]) * 100.0
             st.rerun()
     
     return col1, col2
@@ -35,35 +35,37 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
 def _initialize_session_state():
     """Initialize session state for sliders."""
     if "t1_slider" not in st.session_state:
-        st.session_state.t1_slider = 0.5
+        st.session_state.t1_slider = 50.0  # 50%
     if "rebalance_slider" not in st.session_state:
-        st.session_state.rebalance_slider = 0.0
+        st.session_state.rebalance_slider = 0.0  # 0%
 
 
 def _render_sliders(col1, col2):
     """Render allocation and rebalance sliders."""
     with col1:
-        strategy_t1_ratio = st.slider(
+        strategy_t1_ratio_pct = st.slider(
             "SPY Allocation",
             min_value=0.0,
-            max_value=1.0,
+            max_value=100.0,
             value=st.session_state.t1_slider,
-            step=0.01,
-            format="%.3f",
+            step=1.0,
+            format="%.1f%%",
             key="t1_slider",
         )
+        strategy_t1_ratio = strategy_t1_ratio_pct / 100.0
 
     with col2:
-        strategy_rebalance = st.slider(
+        strategy_rebalance_pct = st.slider(
             "Rebalance Threshold",
             min_value=0.0,
-            max_value=0.10,
+            max_value=10.0,
             value=st.session_state.rebalance_slider,
-            step=0.001,
-            format="%.4f",
+            step=0.1,
+            format="%.1f%%",
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
         )
+        strategy_rebalance = strategy_rebalance_pct / 100.0
     
     return strategy_t1_ratio, strategy_rebalance
 
@@ -151,8 +153,8 @@ def _get_format_spec():
         "CAGR": "{:.2%}",
         "Max Drawdown": "{:.2%}",
         "Rebalances": "{:.0f}",
-        "SPY Allocation": "{:.2f}",
-        "Rebalance Threshold": "{:.3f}",
+        "SPY Allocation": "{:.1%}",
+        "Rebalance Threshold": "{:.1%}",
     }
 
 
