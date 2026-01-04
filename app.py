@@ -28,13 +28,10 @@ ticker1 = st.session_state.get("ticker1", "SPY")
 ticker2 = st.session_state.get("ticker2", "GLD")
 
 # Validate tickers
-if not validate_ticker(ticker1):
-    st.error(f"❌ Invalid ticker symbol: {ticker1}. Please enter a valid ticker.")
-    st.stop()
-
-if not validate_ticker(ticker2):
-    st.error(f"❌ Invalid ticker symbol: {ticker2}. Please enter a valid ticker.")
-    st.stop()
+for ticker in [ticker1, ticker2]:
+    if not validate_ticker(ticker):
+        st.error(f"❌ Invalid ticker symbol: {ticker}. Please enter a valid ticker.")
+        st.stop()
 
 if ticker1 == ticker2:
     st.error(f"❌ Ticker 1 and Ticker 2 must be different. Both are set to {ticker1}.")
