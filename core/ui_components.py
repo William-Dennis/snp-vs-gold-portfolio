@@ -84,6 +84,40 @@ def render_settings():
             help="Display vertical lines on the chart indicating when rebalancing occurred",
         )
 
+        st.markdown("### 🔧 Advanced Settings")
+
+        st.number_input(
+            "Trade Cost (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=0.0,
+            step=0.1,
+            format="%.2f",
+            key="trade_cost_pct",
+            help="Cost applied to each rebalancing trade (e.g., 0.1% means 99.9% of value is maintained)",
+        )
+
+        st.number_input(
+            "Final Year",
+            min_value=2000,
+            max_value=2100,
+            value=2025,
+            step=1,
+            key="final_year",
+            help="End year for historical data analysis",
+        )
+
+        st.number_input(
+            "Risk-Free Rate (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=0.0,
+            step=0.1,
+            format="%.2f",
+            key="risk_free_rate_pct",
+            help="Annual risk-free rate used in Sharpe ratio calculation",
+        )
+
 
 def render_performance_chart(data, strategy_result):
     """Render the combined performance comparison chart."""

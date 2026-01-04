@@ -23,6 +23,8 @@ def run_grid_search(
     ticker2: str = "GLD",
     starting_cash: float = 10_000,
     db_path: str = "results_cache.db",
+    trade_cost: float = 0.0,
+    risk_free_rate: float = 0.0,
 ) -> pd.DataFrame:
     """Run grid search over parameter space with caching."""
     conn = get_db_connection(db_path)
@@ -39,6 +41,8 @@ def run_grid_search(
         ticker1,
         ticker2,
         starting_cash,
+        trade_cost,
+        risk_free_rate,
     )
 
     save_results_batch(conn, to_insert)
@@ -57,6 +61,8 @@ def _process_grid(
     ticker1,
     ticker2,
     starting_cash,
+    trade_cost,
+    risk_free_rate,
 ):
     """Process all parameter combinations in grid."""
     results = []
@@ -74,6 +80,8 @@ def _process_grid(
                 ticker1,
                 ticker2,
                 starting_cash,
+                trade_cost,
+                risk_free_rate,
             )
             results.append(result_dict)
             if insert_tuple:
@@ -83,15 +91,25 @@ def _process_grid(
 
 
 def _compute_strategy_metrics(
-    df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+    df,
+    ticker1,
+    ticker2,
+    t1_ratio,
+    rebalance_rate,
+    starting_cash,
+    trade_cost,
+    risk_free_rate,
 ):
     """Compute strategy result and metrics."""
-    result = run_strategy(df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash)
+    result = run_strategy(
+        df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash, trade_cost
+    )
     metrics = calculate_metrics(
         result["total_cash_value"].values,
         df.index[0],
         df.index[-1],
         int(np.sum(result["rebalance"] != 0)),
+        risk_free_rate,
     )
     return metrics
 
@@ -106,6 +124,8 @@ def _process_params(
     ticker1,
     ticker2,
     starting_cash,
+    trade_cost,
+    risk_free_rate,
 ):
     """Process single parameter combination."""
     hash_key = make_param_hash(
@@ -118,7 +138,14 @@ def _process_params(
         return result_dict, None
 
     metrics = _compute_strategy_metrics(
-        df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+        df,
+        ticker1,
+        ticker2,
+        t1_ratio,
+        rebalance_rate,
+        starting_cash,
+        trade_cost,
+        risk_free_rate,
     )
 
     result_dict = {"rebalance_rate": rebalance_rate, "t1_ratio": t1_ratio, **metrics}

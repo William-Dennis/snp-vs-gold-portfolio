@@ -32,14 +32,28 @@ Adjust your strategy parameters and compare against grid search results.
 # Date range selection dropdown
 period_options = list(AVAILABLE_PERIODS.keys())
 selected_period = st.selectbox(
-    "Select Historical Period (ending 2025-12-31)",
+    "Select Historical Period",
     options=period_options,
     index=period_options.index("10yr"),  # Default to 10yr
-    help="Choose the historical period for analysis. All periods end on December 31, 2025.",
+    help="Choose the historical period for analysis.",
 )
 
+# Get advanced settings from session state
+final_year = st.session_state.get("final_year", 2025)
+trade_cost_pct = st.session_state.get("trade_cost_pct", 0.0)
+risk_free_rate_pct = st.session_state.get("risk_free_rate_pct", 0.0)
+
+# Convert percentages to decimals
+trade_cost = trade_cost_pct / 100.0
+risk_free_rate = risk_free_rate_pct / 100.0
+
 # Load data and run grid search
-data, grid_search_data = load_data_and_search(period=selected_period)
+data, grid_search_data = load_data_and_search(
+    period=selected_period,
+    final_year=final_year,
+    trade_cost=trade_cost,
+    risk_free_rate=risk_free_rate,
+)
 
 # Find optimal strategies
 best_strategies = get_best_strategies(grid_search_data)
@@ -57,12 +71,23 @@ use_relative = st.toggle("Show Relative Metrics", value=False)
 
 # Run strategy with selected parameters
 strategy_result, strategy_metrics = run_strategy_with_metrics(
-    data, "SPY", "GLD", strategy_t1_ratio, strategy_rebalance, 10_000
+    data,
+    "SPY",
+    "GLD",
+    strategy_t1_ratio,
+    strategy_rebalance,
+    10_000,
+    trade_cost,
+    risk_free_rate,
 )
 
 # Calculate baseline metrics
-spy_metrics = calculate_metrics(data["SPY"].values, data.index[0], data.index[-1], 0)
-gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1], 0)
+spy_metrics = calculate_metrics(
+    data["SPY"].values, data.index[0], data.index[-1], 0, risk_free_rate
+)
+gld_metrics = calculate_metrics(
+    data["GLD"].values, data.index[0], data.index[-1], 0, risk_free_rate
+)
 
 # Render UI components
 render_performance_chart(data, strategy_result)

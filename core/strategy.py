@@ -14,6 +14,7 @@ def run_strategy_numba(
     t1_ratio: float,
     rebalance_rate: float,
     starting_cash: float,
+    trade_cost: float = 0.0,
 ) -> np.ndarray:
     """Execute rebalancing strategy (numba-optimized)."""
     n = len(t1_prices)
@@ -32,6 +33,7 @@ def run_strategy_numba(
             t2_cash[i - 1],
             t1_ratio,
             rebalance_rate,
+            trade_cost,
         )
 
     total_cash = t1_cash + t2_cash
@@ -46,6 +48,7 @@ def _process_timestep(
     t2_prev: float,
     t1_ratio: float,
     rebalance_rate: float,
+    trade_cost: float = 0.0,
 ) -> Tuple:
     """Process single timestep: returns, rebalancing."""
     t1_ret = (t1_prices[1] - t1_prices[0]) / t1_prices[0] if t1_prices[0] != 0 else 0.0
@@ -61,11 +64,11 @@ def _process_timestep(
     if rebalance_rate > 0:
         if t1_pct > t1_ratio + rebalance_rate:
             rebal, t1_cash, t2_cash = _rebalance_sell_t1(
-                t1_cash, t2_cash, t1_pct, t1_ratio
+                t1_cash, t2_cash, t1_pct, t1_ratio, trade_cost
             )
         elif t1_pct < t1_ratio - rebalance_rate:
             rebal, t1_cash, t2_cash = _rebalance_sell_t2(
-                t1_cash, t2_cash, t1_pct, t1_ratio
+                t1_cash, t2_cash, t1_pct, t1_ratio, trade_cost
             )
 
     return t1_cash, t2_cash, rebal
@@ -73,22 +76,32 @@ def _process_timestep(
 
 @numba.njit
 def _rebalance_sell_t1(
-    t1_cash: float, t2_cash: float, t1_pct: float, t1_ratio: float
+    t1_cash: float,
+    t2_cash: float,
+    t1_pct: float,
+    t1_ratio: float,
+    trade_cost: float = 0.0,
 ) -> Tuple:
     """Rebalance by selling asset 1."""
     delta = t1_pct / t1_ratio
     sell_amount = t1_cash - (t1_cash / delta)
-    return sell_amount, t1_cash - sell_amount, t2_cash + sell_amount
+    cost_adjusted = sell_amount * (1.0 - trade_cost)
+    return sell_amount, t1_cash - sell_amount, t2_cash + cost_adjusted
 
 
 @numba.njit
 def _rebalance_sell_t2(
-    t1_cash: float, t2_cash: float, t1_pct: float, t1_ratio: float
+    t1_cash: float,
+    t2_cash: float,
+    t1_pct: float,
+    t1_ratio: float,
+    trade_cost: float = 0.0,
 ) -> Tuple:
     """Rebalance by selling asset 2."""
     delta = (1 - t1_pct) / (1 - t1_ratio)
     sell_amount = t2_cash - (t2_cash / delta)
-    return -sell_amount, t1_cash + sell_amount, t2_cash - sell_amount
+    cost_adjusted = sell_amount * (1.0 - trade_cost)
+    return -sell_amount, t1_cash + cost_adjusted, t2_cash - sell_amount
 
 
 def run_strategy(
@@ -98,10 +111,16 @@ def run_strategy(
     t1_ratio: float = 0.5,
     rebalance_rate: float = 0.05,
     starting_cash: float = 10_000,
+    trade_cost: float = 0.0,
 ) -> pd.DataFrame:
     """Run rebalancing strategy on price data."""
     result = run_strategy_numba(
-        df[ticker1].values, df[ticker2].values, t1_ratio, rebalance_rate, starting_cash
+        df[ticker1].values,
+        df[ticker2].values,
+        t1_ratio,
+        rebalance_rate,
+        starting_cash,
+        trade_cost,
     )
 
     output_df = df.copy()
