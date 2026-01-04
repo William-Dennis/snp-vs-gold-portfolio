@@ -129,7 +129,15 @@ def _process_params(
 ):
     """Process single parameter combination."""
     hash_key = make_param_hash(
-        start_date, end_date, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash
+        start_date,
+        end_date,
+        ticker1,
+        ticker2,
+        t1_ratio,
+        rebalance_rate,
+        starting_cash,
+        trade_cost,
+        risk_free_rate,
     )
 
     cached = get_cached_result(conn, hash_key)
@@ -158,6 +166,8 @@ def _process_params(
         t1_ratio,
         rebalance_rate,
         starting_cash,
+        trade_cost,
+        risk_free_rate,
         *metrics.values(),
     )
 

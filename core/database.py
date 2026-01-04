@@ -26,6 +26,8 @@ def _create_results_table(conn: sqlite3.Connection) -> None:
             t1_ratio REAL,
             rebalance_rate REAL,
             starting_cash REAL,
+            trade_cost REAL,
+            risk_free_rate REAL,
             sharpe REAL,
             num_rebalances INTEGER,
             max_drawdown REAL,
@@ -43,6 +45,8 @@ def make_param_hash(
     t1_ratio: float,
     rebalance_rate: float,
     starting_cash: float,
+    trade_cost: float = 0.0,
+    risk_free_rate: float = 0.0,
 ) -> str:
     """Generate unique hash for parameter combination."""
     params = {
@@ -53,6 +57,8 @@ def make_param_hash(
         "t1_ratio": t1_ratio,
         "rebalance_rate": rebalance_rate,
         "starting_cash": starting_cash,
+        "trade_cost": trade_cost,
+        "risk_free_rate": risk_free_rate,
     }
     param_str = json.dumps(params, sort_keys=True)
     return hashlib.sha256(param_str.encode()).hexdigest()
@@ -86,9 +92,9 @@ def save_results_batch(conn: sqlite3.Connection, results: list) -> None:
         """
         INSERT OR IGNORE INTO strategy_results
         (hash, start_date, end_date, ticker1, ticker2, t1_ratio, 
-         rebalance_rate, starting_cash, sharpe, num_rebalances, 
-         max_drawdown, cagr)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         rebalance_rate, starting_cash, trade_cost, risk_free_rate,
+         sharpe, num_rebalances, max_drawdown, cagr)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         results,
     )
