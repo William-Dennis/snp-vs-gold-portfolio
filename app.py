@@ -46,10 +46,12 @@ best_strategies = get_best_strategies(grid_search_data)
 best_sharpe = best_strategies["sharpe"]
 best_cagr = best_strategies["cagr"]
 best_drawdown = best_strategies["drawdown"]
+best_weekly_dd = best_strategies["weekly_drawdown"]
+best_monthly_dd = best_strategies["monthly_drawdown"]
 
 # Render strategy controls and get selected parameters
 strategy_t1_ratio, strategy_rebalance = render_strategy_controls(
-    best_sharpe, best_cagr, best_drawdown
+    best_sharpe, best_cagr, best_drawdown, best_weekly_dd, best_monthly_dd
 )
 
 # Relative metrics toggle
@@ -67,6 +69,9 @@ gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1
 # Render UI components
 render_performance_chart(data, strategy_result)
 
+show_weekly = st.session_state.get("show_weekly_drawdown", False)
+show_monthly = st.session_state.get("show_monthly_drawdown", False)
+
 render_metrics_table(
     strategy_t1_ratio,
     strategy_rebalance,
@@ -76,6 +81,8 @@ render_metrics_table(
     best_drawdown,
     spy_metrics,
     gld_metrics,
+    best_weekly_dd if show_weekly else None,
+    best_monthly_dd if show_monthly else None,
 )
 
 render_heatmaps(
@@ -87,4 +94,6 @@ render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    best_weekly_dd if show_weekly else None,
+    best_monthly_dd if show_monthly else None,
 )

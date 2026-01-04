@@ -11,6 +11,8 @@ MARKER_COLORS = {
     "Max Sharpe Strategy": "#4ECDC4",
     "Max CAGR Strategy": "#FFD93D",
     "Min Drawdown Strategy": "#95E1D3",
+    "Min Weekly DD Strategy": "#A8E6CF",
+    "Min Monthly DD Strategy": "#FFB6C1",
 }
 
 MARKER_SYMBOLS = {
@@ -18,6 +20,8 @@ MARKER_SYMBOLS = {
     "Max Sharpe Strategy": "diamond",
     "Max CAGR Strategy": "square",
     "Min Drawdown Strategy": "circle",
+    "Min Weekly DD Strategy": "triangle-up",
+    "Min Monthly DD Strategy": "triangle-down",
 }
 
 # Line chart colors
@@ -30,10 +34,12 @@ LINE_CHART_COLORS = {
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+
 def hex_to_rgba(hex_color, alpha=0.3):
     hex_color = hex_color.lstrip("#")
-    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    r, g, b = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
     return f"rgba({r},{g},{b},{alpha})"
+
 
 def plot_all_columns(
     df: pd.DataFrame,
@@ -286,6 +292,8 @@ def _get_label(param: str) -> str:
         "sharpe": "Sharpe Ratio",
         "cagr": "CAGR",
         "max_drawdown": "Max Drawdown",
+        "max_weekly_drawdown": "Max Weekly Drawdown",
+        "max_monthly_drawdown": "Max Monthly Drawdown",
         "num_rebalances": "Number of Rebalances",
     }
     return labels.get(param, param)
@@ -301,7 +309,12 @@ def _format_param_value(param: str, value: float) -> str:
 
 def _format_value(metric: str, value: float) -> str:
     """Format value based on metric type."""
-    if metric in ["cagr", "max_drawdown"]:
+    if metric in [
+        "cagr",
+        "max_drawdown",
+        "max_weekly_drawdown",
+        "max_monthly_drawdown",
+    ]:
         return f"{value:.2%}"
     elif metric == "sharpe":
         return f"{value:.4f}"
