@@ -14,11 +14,15 @@ from core.ui_components import (
     render_performance_chart,
     render_metrics_table,
     render_heatmaps,
+    render_settings,
 )
 from core.data_downloader import AVAILABLE_PERIODS
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 st.title("SPY vs GLD Portfolio Analysis")
+
+# Render settings in sidebar
+render_settings()
 
 st.markdown("""
 Explore optimal rebalancing strategies for a two-asset portfolio.

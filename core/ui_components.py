@@ -37,11 +37,6 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
     return col1, col2
 
 
-def _initialize_session_state():
-    """Initialize session."""
-    pass
-
-
 def _render_sliders(col1, col2):
     """Render allocation and rebalance sliders."""
     with col1:
@@ -50,7 +45,7 @@ def _render_sliders(col1, col2):
             min_value=0.0,
             max_value=100.0,
             step=1.0,
-            value = 50.0,
+            value=50.0,
             format="%.1f%%",
             key="t1_slider",
         )
@@ -62,7 +57,7 @@ def _render_sliders(col1, col2):
             min_value=1.0,
             max_value=11.0,
             step=0.1,
-            value = 11.0,
+            value=11.0,
             format="%.1f%%",
             help="Rebalance when allocation drifts by this amount",
             key="rebalance_slider",
@@ -74,9 +69,20 @@ def _render_sliders(col1, col2):
 
 def render_strategy_controls(best_sharpe, best_cagr, best_drawdown):
     """Render strategy configuration controls."""
-    _initialize_session_state()
     col1, col2 = _render_preset_buttons(best_sharpe, best_cagr, best_drawdown)
     return _render_sliders(col1, col2)
+
+
+def render_settings():
+    """Render settings in sidebar with advanced options."""
+    with st.sidebar:
+        st.markdown("### ⚙️ Settings")
+        st.checkbox(
+            "Show Rebalancing Lines",
+            value=False,
+            key="show_rebalance_lines",
+            help="Display vertical lines on the chart indicating when rebalancing occurred",
+        )
 
 
 def render_performance_chart(data, strategy_result):
@@ -87,7 +93,22 @@ def render_performance_chart(data, strategy_result):
     normalized_data["Your Strategy"] = (
         strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
     )
-    plot_all_columns(normalized_data, title="", y_label="Normalised Price", height=800)
+
+    rebalance_mask = strategy_result["rebalance"] != 0
+    rebalance_dates = strategy_result.index[rebalance_mask].tolist()
+    rebalance_amounts = strategy_result.loc[rebalance_mask, "rebalance"].tolist()
+
+    # Pass rebalancing data only if toggle is enabled
+    show_rebalancing = st.session_state.show_rebalance_lines
+
+    plot_all_columns(
+        normalized_data,
+        title="",
+        y_label="Normalised Price",
+        height=800,
+        rebalance_dates=rebalance_dates if show_rebalancing else None,
+        rebalance_amounts=rebalance_amounts if show_rebalancing else None,
+    )
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):

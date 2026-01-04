@@ -20,21 +20,65 @@ MARKER_SYMBOLS = {
     "Min Drawdown Strategy": "circle",
 }
 
+# Line chart colors
+LINE_CHART_COLORS = {
+    "SPY": "#FF0000",  # Orange
+    "GLD": "#FFD900",  # Gold
+    "Your Strategy": "#0066FF",  # Red (consistent with marker colors)
+}
+
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+def hex_to_rgba(hex_color, alpha=0.3):
+    hex_color = hex_color.lstrip("#")
+    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{alpha})"
 
 def plot_all_columns(
-    df: pd.DataFrame, x_label="Date", y_label="Price", title="", height=800
+    df: pd.DataFrame,
+    x_label="Date",
+    y_label="Price",
+    title="",
+    height=800,
+    rebalance_dates=None,
+    rebalance_amounts=None,
 ):
-    """Plot all numeric columns as line charts."""
+    """Plot all numeric columns as line charts with optional rebalancing markers."""
     fig = go.Figure()
 
     for col in df.select_dtypes(include="number").columns:
         series = df[col]
         fig.add_trace(
-            go.Scatter(x=series.index, y=series.values, mode="lines", name=col)
+            go.Scatter(
+                x=series.index,
+                y=series.values,
+                mode="lines",
+                name=col,
+                line=dict(color=LINE_CHART_COLORS.get(col)),
+            )
         )
+
+    if rebalance_dates and rebalance_amounts:
+        for date, amount in zip(rebalance_dates, rebalance_amounts):
+            # Positive amount: selling SPY to buy GLD (gold line)
+            # Negative amount: selling GLD to buy SPY (blue line)
+            if amount > 0:
+                color = LINE_CHART_COLORS["GLD"]  # Buying GLD
+            else:
+                color = LINE_CHART_COLORS["SPY"]  # Buying SPY
+
+            color = hex_to_rgba(color)
+
+            fig.add_shape(
+                type="line",
+                x0=date,
+                x1=date,
+                y0=0,
+                y1=1,
+                yref="paper",
+                line=dict(color=color, width=2, dash="dot"),
+            )
 
     fig.update_layout(
         title=title,
