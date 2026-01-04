@@ -126,7 +126,7 @@ def _process_params(
     starting_cash,
     trade_cost,
     risk_free_rate,
-):
+) -> "Tuple[dict, Optional[tuple]]":
     """Process single parameter combination."""
     hash_key = make_param_hash(
         start_date,
