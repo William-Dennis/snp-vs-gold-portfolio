@@ -40,7 +40,7 @@ def load_data_and_search(
     final_year: int = 2025,
     trade_cost: float = 0.0,
     risk_free_rate: float = 0.0,
-):
+) -> "Tuple[pd.DataFrame, pd.DataFrame]":
     """Load data and run grid search (cached for performance)."""
     data = get_two_series(period=period, final_year=final_year)
     grid_results = run_grid_search(
