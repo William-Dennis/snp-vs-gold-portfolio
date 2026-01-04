@@ -22,14 +22,18 @@ MARKER_SYMBOLS = {
 
 # Line chart colors
 LINE_CHART_COLORS = {
-    "SPY": "#00008B",  # Deep Blue
-    "GLD": "#FFD700",  # Gold
-    "Your Strategy": "#FF6B6B",  # Red (consistent with marker colors)
+    "SPY": "#FF0000",  # Orange
+    "GLD": "#FFD900",  # Gold
+    "Your Strategy": "#0066FF",  # Red (consistent with marker colors)
 }
 
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+def hex_to_rgba(hex_color, alpha=0.3):
+    hex_color = hex_color.lstrip("#")
+    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{alpha})"
 
 def plot_all_columns(
     df: pd.DataFrame,
@@ -63,6 +67,8 @@ def plot_all_columns(
                 color = LINE_CHART_COLORS["GLD"]  # Buying GLD
             else:
                 color = LINE_CHART_COLORS["SPY"]  # Buying SPY
+
+            color = hex_to_rgba(color)
 
             fig.add_shape(
                 type="line",
