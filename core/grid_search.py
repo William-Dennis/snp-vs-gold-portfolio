@@ -99,7 +99,7 @@ def _compute_strategy_metrics(
     starting_cash,
     trade_cost,
     risk_free_rate,
-):
+) -> "Dict":
     """Compute strategy result and metrics."""
     result = run_strategy(
         df, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash, trade_cost
