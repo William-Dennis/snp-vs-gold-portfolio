@@ -16,13 +16,31 @@ from core.ui_components import (
     render_heatmaps,
     render_settings,
 )
-from core.data_downloader import AVAILABLE_PERIODS
+from core.data_downloader import AVAILABLE_PERIODS, validate_ticker
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
-st.title("SPY vs GLD Portfolio Analysis")
 
-# Render settings in sidebar
+# Render settings in sidebar (must be done early to get ticker inputs)
 render_settings()
+
+# Get tickers from session state (defaults set in render_settings)
+ticker1 = st.session_state.get("ticker1", "SPY")
+ticker2 = st.session_state.get("ticker2", "GLD")
+
+# Validate tickers
+if not validate_ticker(ticker1):
+    st.error(f"❌ Invalid ticker symbol: {ticker1}. Please enter a valid ticker.")
+    st.stop()
+
+if not validate_ticker(ticker2):
+    st.error(f"❌ Invalid ticker symbol: {ticker2}. Please enter a valid ticker.")
+    st.stop()
+
+if ticker1 == ticker2:
+    st.error(f"❌ Ticker 1 and Ticker 2 must be different. Both are set to {ticker1}.")
+    st.stop()
+
+st.title(f"{ticker1} vs {ticker2} Portfolio Analysis")
 
 st.markdown("""
 Explore optimal rebalancing strategies for a two-asset portfolio.
@@ -39,7 +57,9 @@ selected_period = st.selectbox(
 )
 
 # Load data and run grid search
-data, grid_search_data = load_data_and_search(period=selected_period)
+data, grid_search_data = load_data_and_search(
+    ticker1=ticker1, ticker2=ticker2, period=selected_period
+)
 
 # Find optimal strategies
 best_strategies = get_best_strategies(grid_search_data)
@@ -49,7 +69,7 @@ best_drawdown = best_strategies["drawdown"]
 
 # Render strategy controls and get selected parameters
 strategy_t1_ratio, strategy_rebalance = render_strategy_controls(
-    best_sharpe, best_cagr, best_drawdown
+    best_sharpe, best_cagr, best_drawdown, ticker1
 )
 
 # Relative metrics toggle
@@ -57,12 +77,16 @@ use_relative = st.toggle("Show Relative Metrics", value=False)
 
 # Run strategy with selected parameters
 strategy_result, strategy_metrics = run_strategy_with_metrics(
-    data, "SPY", "GLD", strategy_t1_ratio, strategy_rebalance, 10_000
+    data, ticker1, ticker2, strategy_t1_ratio, strategy_rebalance, 10_000
 )
 
 # Calculate baseline metrics
-spy_metrics = calculate_metrics(data["SPY"].values, data.index[0], data.index[-1], 0)
-gld_metrics = calculate_metrics(data["GLD"].values, data.index[0], data.index[-1], 0)
+ticker1_metrics = calculate_metrics(
+    data[ticker1].values, data.index[0], data.index[-1], 0
+)
+ticker2_metrics = calculate_metrics(
+    data[ticker2].values, data.index[0], data.index[-1], 0
+)
 
 # Render UI components
 render_performance_chart(data, strategy_result)
@@ -74,8 +98,10 @@ render_metrics_table(
     best_sharpe,
     best_cagr,
     best_drawdown,
-    spy_metrics,
-    gld_metrics,
+    ticker1_metrics,
+    ticker2_metrics,
+    ticker1,
+    ticker2,
 )
 
 render_heatmaps(
@@ -87,4 +113,5 @@ render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    ticker1,
 )

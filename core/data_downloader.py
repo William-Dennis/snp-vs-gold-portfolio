@@ -3,7 +3,7 @@
 import yfinance as yf
 import pandas as pd
 import streamlit as st
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 # Fixed end date for all data
@@ -39,6 +39,21 @@ def calculate_start_date(period: str) -> str:
     start_year = end_date.year - years_back
     start_date = end_date.replace(year=start_year)
     return start_date.strftime("%Y-%m-%d")
+
+
+def validate_ticker(ticker: str) -> bool:
+    """Validate if a ticker has valid format."""
+    if not ticker or len(ticker) == 0:
+        return False
+
+    # Basic format validation - tickers should be alphanumeric and reasonable length
+    if not ticker.replace(".", "").replace("-", "").replace("^", "").isalnum():
+        return False
+
+    if len(ticker) > 10:  # Most tickers are under 10 characters
+        return False
+
+    return True
 
 
 @st.cache_data()

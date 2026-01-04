@@ -37,11 +37,11 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
     return col1, col2
 
 
-def _render_sliders(col1, col2):
+def _render_sliders(col1, col2, ticker1_name: str = "Ticker 1"):
     """Render allocation and rebalance sliders."""
     with col1:
         strategy_t1_ratio_pct = st.slider(
-            "SPY Allocation",
+            f"{ticker1_name} Allocation",
             min_value=0.0,
             max_value=100.0,
             step=1.0,
@@ -67,16 +67,49 @@ def _render_sliders(col1, col2):
     return strategy_t1_ratio, strategy_rebalance
 
 
-def render_strategy_controls(best_sharpe, best_cagr, best_drawdown):
+def render_strategy_controls(
+    best_sharpe, best_cagr, best_drawdown, ticker1_name: str = "Ticker 1"
+):
     """Render strategy configuration controls."""
     col1, col2 = _render_preset_buttons(best_sharpe, best_cagr, best_drawdown)
-    return _render_sliders(col1, col2)
+    return _render_sliders(col1, col2, ticker1_name)
 
 
 def render_settings():
     """Render settings in sidebar with advanced options."""
     with st.sidebar:
         st.markdown("### ⚙️ Settings")
+
+        st.markdown("#### Ticker Symbols")
+        st.warning("⚠️ Changing tickers may take a few minutes to process")
+
+        ticker1 = (
+            st.text_input(
+                "Ticker 1",
+                value=st.session_state.get("ticker1", "SPY"),
+                key="ticker1_input",
+                help="Enter a valid ticker symbol (e.g., SPY, QQQ, AAPL)",
+            )
+            .upper()
+            .strip()
+        )
+
+        ticker2 = (
+            st.text_input(
+                "Ticker 2",
+                value=st.session_state.get("ticker2", "GLD"),
+                key="ticker2_input",
+                help="Enter a valid ticker symbol (e.g., GLD, TLT, BND)",
+            )
+            .upper()
+            .strip()
+        )
+
+        # Store in session state
+        st.session_state.ticker1 = ticker1
+        st.session_state.ticker2 = ticker2
+
+        st.markdown("---")
         st.checkbox(
             "Show Rebalancing Lines",
             value=False,
@@ -90,8 +123,10 @@ def render_performance_chart(data, strategy_result):
     st.subheader("Performance Comparison")
 
     normalized_data = data.copy()
+    # Use the first column name (ticker1) to normalize the strategy
+    first_ticker = data.columns[0]
     normalized_data["Your Strategy"] = (
-        strategy_result["total_cash_value"] / 10_000 * data["SPY"].iloc[0]
+        strategy_result["total_cash_value"] / 10_000 * data[first_ticker].iloc[0]
     )
 
     rebalance_mask = strategy_result["rebalance"] != 0
@@ -112,7 +147,7 @@ def render_performance_chart(data, strategy_result):
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):
-    """Get SPY allocation values for all strategies."""
+    """Get Ticker 1 allocation values for all strategies."""
     return [
         strategy_t1_ratio,
         float(best_sharpe["t1_ratio"]),
@@ -162,8 +197,10 @@ def _create_metrics_dataframe(
     best_sharpe,
     best_cagr,
     best_drawdown,
-    spy_metrics,
-    gld_metrics,
+    ticker1_metrics,
+    ticker2_metrics,
+    ticker1_name: str,
+    ticker2_name: str,
 ):
     """Create metrics comparison dataframe."""
     return pd.DataFrame(
@@ -173,10 +210,10 @@ def _create_metrics_dataframe(
                 "Max Sharpe Strategy",
                 "Max CAGR Strategy",
                 "Min Drawdown Strategy",
-                "SPY Only",
-                "GLD Only",
+                f"{ticker1_name} Only",
+                f"{ticker2_name} Only",
             ],
-            "SPY Allocation": _get_allocation_values(
+            f"{ticker1_name} Allocation": _get_allocation_values(
                 strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown
             ),
             "Rebalance Threshold": _get_rebalance_values(
@@ -188,8 +225,8 @@ def _create_metrics_dataframe(
                 best_sharpe,
                 best_cagr,
                 best_drawdown,
-                spy_metrics,
-                gld_metrics,
+                ticker1_metrics,
+                ticker2_metrics,
             ),
             "CAGR": _get_metric_values(
                 "cagr",
@@ -197,8 +234,8 @@ def _create_metrics_dataframe(
                 best_sharpe,
                 best_cagr,
                 best_drawdown,
-                spy_metrics,
-                gld_metrics,
+                ticker1_metrics,
+                ticker2_metrics,
             ),
             "Max Drawdown": _get_metric_values(
                 "max_drawdown",
@@ -206,8 +243,8 @@ def _create_metrics_dataframe(
                 best_sharpe,
                 best_cagr,
                 best_drawdown,
-                spy_metrics,
-                gld_metrics,
+                ticker1_metrics,
+                ticker2_metrics,
             ),
             "Rebalances": _get_metric_values(
                 "num_rebalances",
@@ -215,21 +252,21 @@ def _create_metrics_dataframe(
                 best_sharpe,
                 best_cagr,
                 best_drawdown,
-                spy_metrics,
-                gld_metrics,
+                ticker1_metrics,
+                ticker2_metrics,
             ),
         }
     )
 
 
-def _get_format_spec():
+def _get_format_spec(ticker1_name: str):
     """Get format specification for metrics table."""
     return {
         "Sharpe": "{:.4f}",
         "CAGR": "{:.2%}",
         "Max Drawdown": "{:.2%}",
         "Rebalances": "{:.0f}",
-        "SPY Allocation": "{:.1%}",
+        f"{ticker1_name} Allocation": "{:.1%}",
         "Rebalance Threshold": "{:.1%}",
     }
 
@@ -241,8 +278,10 @@ def render_metrics_table(
     best_sharpe,
     best_cagr,
     best_drawdown,
-    spy_metrics,
-    gld_metrics,
+    ticker1_metrics,
+    ticker2_metrics,
+    ticker1_name: str = "Ticker 1",
+    ticker2_name: str = "Ticker 2",
 ):
     """Render the metrics comparison table."""
     st.subheader("Performance Metrics")
@@ -254,12 +293,14 @@ def render_metrics_table(
         best_sharpe,
         best_cagr,
         best_drawdown,
-        spy_metrics,
-        gld_metrics,
+        ticker1_metrics,
+        ticker2_metrics,
+        ticker1_name,
+        ticker2_name,
     )
 
     st.dataframe(
-        metrics_df.style.format(_get_format_spec()),
+        metrics_df.style.format(_get_format_spec(ticker1_name)),
         width="stretch",
         hide_index=True,
     )
@@ -274,6 +315,7 @@ def render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    ticker1_name: str = "Ticker 1",
 ):
     """Render the grid search heatmaps with strategy markers."""
     st.subheader("Grid Search Results")
@@ -315,6 +357,7 @@ def render_heatmaps(
                 baseline_value=strategy_metrics[metrics[i]],
                 use_relative=use_relative,
                 strategy_markers=strategy_markers,
+                ticker1_name=ticker1_name,
             )
         if i + 1 < len(metrics):
             with col2:
@@ -326,4 +369,5 @@ def render_heatmaps(
                     baseline_value=strategy_metrics[metrics[i + 1]],
                     use_relative=use_relative,
                     strategy_markers=strategy_markers,
+                    ticker1_name=ticker1_name,
                 )

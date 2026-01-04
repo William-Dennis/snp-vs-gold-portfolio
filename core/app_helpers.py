@@ -32,10 +32,12 @@ def run_strategy_with_metrics(
 
 
 @st.cache_data
-def load_data_and_search(period: str = "10yr"):
+def load_data_and_search(
+    ticker1: str = "SPY", ticker2: str = "GLD", period: str = "10yr"
+):
     """Load data and run grid search (cached for performance)."""
-    data = get_two_series(period=period)
-    grid_results = run_grid_search(data)
+    data = get_two_series(ticker1=ticker1, ticker2=ticker2, period=period)
+    grid_results = run_grid_search(data, ticker1=ticker1, ticker2=ticker2)
     return data, grid_results
 
 
