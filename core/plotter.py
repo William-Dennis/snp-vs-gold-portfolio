@@ -30,10 +30,12 @@ LINE_CHART_COLORS = {
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+
 def hex_to_rgba(hex_color, alpha=0.3):
     hex_color = hex_color.lstrip("#")
-    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    r, g, b = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
     return f"rgba({r},{g},{b},{alpha})"
+
 
 def plot_all_columns(
     df: pd.DataFrame,
@@ -105,16 +107,18 @@ def _get_heatmap_style(z_label, baseline_value, z, use_relative):
         return z_label, z_label, "RdYlGn", None, ""
 
 
-def _prepare_heatmap_data(df, x, y, z, baseline_value, use_relative):
+def _prepare_heatmap_data(
+    df, x, y, z, baseline_value, use_relative, ticker1_name: str = "Ticker 1"
+):
     """Prepare data and styling for heatmap."""
     pivot_table = df.pivot(index=y, columns=x, values=z).sort_index().sort_index(axis=1)
 
     if pivot_table.isna().any().any():
         raise ValueError(f"Incomplete data in '{z}'")
 
-    x_label = _get_label(x)
-    y_label = _get_label(y)
-    z_label = _get_label(z)
+    x_label = _get_label(x, ticker1_name)
+    y_label = _get_label(y, ticker1_name)
+    z_label = _get_label(z, ticker1_name)
 
     display_values = (
         _calc_relative(pivot_table.values, baseline_value)
@@ -241,6 +245,7 @@ def plot_2d_heatmap(
     baseline_value: float = None,
     use_relative: bool = False,
     strategy_markers: list = None,
+    ticker1_name: str = "Ticker 1",
 ):
     """Plot professional square 2D heatmap with proper labels and strategy markers."""
     (
@@ -254,7 +259,7 @@ def plot_2d_heatmap(
         x_label,
         y_label,
         z_label,
-    ) = _prepare_heatmap_data(df, x, y, z, baseline_value, use_relative)
+    ) = _prepare_heatmap_data(df, x, y, z, baseline_value, use_relative, ticker1_name)
 
     hover_text = _create_hover_text(
         pivot_table, x, y, z, display_values, use_relative, value_suffix
@@ -278,11 +283,11 @@ def plot_2d_heatmap(
     st.plotly_chart(fig, width="stretch")
 
 
-def _get_label(param: str) -> str:
+def _get_label(param: str, ticker1_name: str = "Ticker 1") -> str:
     """Convert parameter name to human-readable label."""
     labels = {
         "rebalance_rate": "Rebalance Threshold",
-        "t1_ratio": "SPY Allocation",
+        "t1_ratio": f"{ticker1_name} Allocation",
         "sharpe": "Sharpe Ratio",
         "cagr": "CAGR",
         "max_drawdown": "Max Drawdown",

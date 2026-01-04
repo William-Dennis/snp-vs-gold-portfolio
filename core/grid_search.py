@@ -17,10 +17,10 @@ STEPS = 201
 
 def run_grid_search(
     df: pd.DataFrame,
-    rebalance_ratios: np.ndarray = np.linspace(0.01, 0.11, STEPS),
-    t1_ratios: np.ndarray = np.linspace(0, 1.0, STEPS),
     ticker1: str = "SPY",
     ticker2: str = "GLD",
+    rebalance_ratios: np.ndarray = np.linspace(0.01, 0.11, STEPS),
+    t1_ratios: np.ndarray = np.linspace(0, 1.0, STEPS),
     starting_cash: float = 10_000,
     db_path: str = "results_cache.db",
 ) -> pd.DataFrame:
