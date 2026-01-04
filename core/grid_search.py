@@ -63,7 +63,7 @@ def _process_grid(
     starting_cash,
     trade_cost,
     risk_free_rate,
-):
+) -> "Tuple[list[dict], list[tuple]]":
     """Process all parameter combinations in grid."""
     results = []
     to_insert = []
