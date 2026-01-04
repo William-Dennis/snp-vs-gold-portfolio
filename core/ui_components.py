@@ -37,12 +37,6 @@ def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
     return col1, col2
 
 
-def _initialize_session_state():
-    """Initialize session state for settings."""
-    if "show_rebalance_lines" not in st.session_state:
-        st.session_state.show_rebalance_lines = True
-
-
 def _render_sliders(col1, col2):
     """Render allocation and rebalance sliders."""
     with col1:
@@ -85,7 +79,7 @@ def render_settings():
         st.markdown("### ⚙️ Settings")
         st.checkbox(
             "Show Rebalancing Lines",
-            value=st.session_state.show_rebalance_lines,
+            value=False,
             key="show_rebalance_lines",
             help="Display vertical lines on the chart indicating when rebalancing occurred",
         )

@@ -15,15 +15,11 @@ from core.ui_components import (
     render_metrics_table,
     render_heatmaps,
     render_settings,
-    _initialize_session_state,
 )
 from core.data_downloader import AVAILABLE_PERIODS
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 st.title("SPY vs GLD Portfolio Analysis")
-
-# Initialize session state
-_initialize_session_state()
 
 # Render settings in sidebar
 render_settings()
