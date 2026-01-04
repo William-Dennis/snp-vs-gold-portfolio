@@ -49,7 +49,7 @@ def get_two_series(
     ticker2: str = "GLD",
     period: str = "10yr",
     final_year: int = 2025,
-):
+) -> pd.DataFrame:
     """Get normalized price series for two tickers with data length checking."""
     start_date = calculate_start_date(period, final_year)
     end_date = get_end_date(final_year)
