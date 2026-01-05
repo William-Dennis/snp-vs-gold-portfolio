@@ -1,5 +1,7 @@
 """UI components and helper functions for the Streamlit app."""
 
+from typing import Dict, Tuple
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -19,7 +21,7 @@ def run_strategy_with_metrics(
     starting_cash: float,
     trade_cost: float = 0.0,
     risk_free_rate: float = 0.0,
-) -> tuple[pd.DataFrame, dict]:
+) -> Tuple[pd.DataFrame, Dict]:
     """Run strategy and calculate metrics in one call."""
     result = run_strategy(
         data, ticker1, ticker2, t1_ratio, rebalance_rate, starting_cash, trade_cost
@@ -40,7 +42,7 @@ def load_data_and_search(
     final_year: int = 2025,
     trade_cost: float = 0.0,
     risk_free_rate: float = 0.0,
-) -> "Tuple[pd.DataFrame, pd.DataFrame]":
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load data and run grid search (cached for performance)."""
     data = get_two_series(period=period, final_year=final_year)
     grid_results = run_grid_search(
@@ -49,7 +51,7 @@ def load_data_and_search(
     return data, grid_results
 
 
-def get_best_strategies(grid_search_data: pd.DataFrame) -> dict:
+def get_best_strategies(grid_search_data: pd.DataFrame) -> Dict:
     """Extract best strategies from grid search results."""
     return {
         "sharpe": grid_search_data.nlargest(1, "sharpe").iloc[0],
