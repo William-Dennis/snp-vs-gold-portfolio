@@ -6,6 +6,13 @@ import pandas as pd
 from .plotter import plot_2d_heatmap, plot_all_columns
 
 
+def _apply_strategy(strategy):
+    """Apply a strategy by updating session state and triggering rerun."""
+    st.session_state.t1_slider = float(strategy["t1_ratio"]) * 100.0
+    st.session_state.rebalance_slider = float(strategy["rebalance_rate"]) * 100.0
+    st.rerun()
+
+
 def _render_preset_buttons(
     best_sharpe, best_cagr, best_drawdown, best_weekly_dd, best_monthly_dd
 ):
@@ -18,47 +25,27 @@ def _render_preset_buttons(
 
     with cols[2]:
         if st.button("Max Sharpe Strategy", width="stretch"):
-            st.session_state.t1_slider = float(best_sharpe["t1_ratio"]) * 100.0
-            st.session_state.rebalance_slider = (
-                float(best_sharpe["rebalance_rate"]) * 100.0
-            )
-            st.rerun()
+            _apply_strategy(best_sharpe)
 
     with cols[3]:
         if st.button("Max CAGR Strategy", width="stretch"):
-            st.session_state.t1_slider = float(best_cagr["t1_ratio"]) * 100.0
-            st.session_state.rebalance_slider = (
-                float(best_cagr["rebalance_rate"]) * 100.0
-            )
-            st.rerun()
+            _apply_strategy(best_cagr)
 
     with cols[4]:
         if st.button("Min Drawdown Strategy", width="stretch"):
-            st.session_state.t1_slider = float(best_drawdown["t1_ratio"]) * 100.0
-            st.session_state.rebalance_slider = (
-                float(best_drawdown["rebalance_rate"]) * 100.0
-            )
-            st.rerun()
+            _apply_strategy(best_drawdown)
 
     col_idx = 5
     if show_weekly:
         with cols[col_idx]:
             if st.button("Min Weekly DD Strategy", width="stretch"):
-                st.session_state.t1_slider = float(best_weekly_dd["t1_ratio"]) * 100.0
-                st.session_state.rebalance_slider = (
-                    float(best_weekly_dd["rebalance_rate"]) * 100.0
-                )
-                st.rerun()
+                _apply_strategy(best_weekly_dd)
         col_idx += 1
 
     if show_monthly:
         with cols[col_idx]:
             if st.button("Min Monthly DD Strategy", width="stretch"):
-                st.session_state.t1_slider = float(best_monthly_dd["t1_ratio"]) * 100.0
-                st.session_state.rebalance_slider = (
-                    float(best_monthly_dd["rebalance_rate"]) * 100.0
-                )
-                st.rerun()
+                _apply_strategy(best_monthly_dd)
 
     return cols[0], cols[1]
 
