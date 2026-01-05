@@ -21,8 +21,6 @@ def calculate_sharpe(series: pd.Series, risk_free_rate: float = 0.0) -> float:
 
 def calculate_max_rolling_drawdown(series: pd.Series, window: int) -> float:
     """Calculate maximum drawdown over a rolling window."""
-    if len(series) < window:
-        return series.pct_change().min()
     rolling_returns = series.pct_change(window).dropna()
     return rolling_returns.min() if len(rolling_returns) > 0 else 0.0
 
