@@ -40,7 +40,7 @@ def calculate_metrics(
         "sharpe": calculate_sharpe(series),
         "num_rebalances": rebalance_count,
         "max_drawdown": series.pct_change().min(),
-        "max_weekly_drawdown": calculate_max_rolling_drawdown(series, 5),
-        "max_monthly_drawdown": calculate_max_rolling_drawdown(series, 21),
+        "max_weekly_drawdown": calculate_max_rolling_drawdown(series, 5), # TODO: Use a constant e.g. WEEKLY_WINDOW
+        "max_monthly_drawdown": calculate_max_rolling_drawdown(series, 21), # TODO: Use a constant e.g. MONTHLY_WINDOW
         "cagr": cagr,
     }
