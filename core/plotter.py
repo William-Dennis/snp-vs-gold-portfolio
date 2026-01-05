@@ -393,8 +393,8 @@ def plot_percentage_change(
     """Plot daily percentage changes of two tickers."""
     fig = go.Figure()
 
-    pct_change_1 = df[ticker1].pct_change() * 100
-    pct_change_2 = df[ticker2].pct_change() * 100
+    pct_change_1 = df[ticker1].pct_change().dropna() * 100
+    pct_change_2 = df[ticker2].pct_change().dropna() * 100
 
     fig.add_trace(
         go.Scatter(
@@ -402,7 +402,7 @@ def plot_percentage_change(
             y=pct_change_1.values,
             mode="lines",
             name=f"{ticker1} %",
-            line=dict(color=LINE_CHART_COLORS.get(ticker1), width=1),
+            line=dict(color=LINE_CHART_COLORS.get(ticker1, "#666666"), width=1),
         )
     )
 
@@ -412,7 +412,7 @@ def plot_percentage_change(
             y=pct_change_2.values,
             mode="lines",
             name=f"{ticker2} %",
-            line=dict(color=LINE_CHART_COLORS.get(ticker2), width=1),
+            line=dict(color=LINE_CHART_COLORS.get(ticker2, "#999999"), width=1),
         )
     )
 
