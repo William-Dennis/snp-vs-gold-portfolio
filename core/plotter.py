@@ -30,10 +30,12 @@ LINE_CHART_COLORS = {
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+
 def hex_to_rgba(hex_color, alpha=0.3):
     hex_color = hex_color.lstrip("#")
-    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    r, g, b = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
     return f"rgba({r},{g},{b},{alpha})"
+
 
 def plot_all_columns(
     df: pd.DataFrame,
@@ -383,3 +385,42 @@ def _calc_relative(values, baseline):
     if baseline == 0:
         return values - baseline
     return ((values - baseline) / abs(baseline)) * 100
+
+
+def plot_percentage_change(
+    df: pd.DataFrame, ticker1: str = "SPY", ticker2: str = "GLD", height=200
+):
+    """Plot daily percentage changes of two tickers."""
+    fig = go.Figure()
+
+    pct_change_1 = df[ticker1].pct_change() * 100
+    pct_change_2 = df[ticker2].pct_change() * 100
+
+    fig.add_trace(
+        go.Scatter(
+            x=pct_change_1.index,
+            y=pct_change_1.values,
+            mode="lines",
+            name=f"{ticker1} %",
+            line=dict(color=LINE_CHART_COLORS.get(ticker1), width=1),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=pct_change_2.index,
+            y=pct_change_2.values,
+            mode="lines",
+            name=f"{ticker2} %",
+            line=dict(color=LINE_CHART_COLORS.get(ticker2), width=1),
+        )
+    )
+
+    fig.update_layout(
+        xaxis_title="Date",
+        yaxis_title="Daily % Change",
+        height=height,
+        margin=dict(l=40, r=40, t=10, b=40),
+    )
+
+    st.plotly_chart(fig, width="stretch")
