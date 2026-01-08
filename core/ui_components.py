@@ -3,7 +3,7 @@
 import streamlit as st
 import pandas as pd
 
-from .plotter import plot_2d_heatmap, plot_all_columns
+from .plotter import plot_2d_heatmap, plot_all_columns, plot_portfolio_allocation
 
 
 def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
@@ -83,6 +83,12 @@ def render_settings():
             key="show_rebalance_lines",
             help="Display vertical lines on the chart indicating when rebalancing occurred",
         )
+        st.checkbox(
+            "Show % Allocation Chart",
+            value=False,
+            key="show_pct_allocation_chart",
+            help="Display a chart showing portfolio allocation percentages of SPY vs GLD",
+        )
 
 
 def render_performance_chart(data, strategy_result):
@@ -109,6 +115,17 @@ def render_performance_chart(data, strategy_result):
         rebalance_dates=rebalance_dates if show_rebalancing else None,
         rebalance_amounts=rebalance_amounts if show_rebalancing else None,
     )
+
+    # Add percentage change chart if enabled
+    if st.session_state.get("show_pct_allocation_chart", False):
+        plot_portfolio_allocation(
+            strategy_result,
+            "SPY",
+            "GLD",
+            height=200,
+            rebalance_dates=rebalance_dates if show_rebalancing else None,
+            rebalance_amounts=rebalance_amounts if show_rebalancing else None,
+        )
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):

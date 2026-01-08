@@ -30,10 +30,12 @@ LINE_CHART_COLORS = {
 # Parameters that should be displayed as percentages
 PERCENTAGE_PARAMS = ["rebalance_rate", "t1_ratio"]
 
+
 def hex_to_rgba(hex_color, alpha=0.3):
     hex_color = hex_color.lstrip("#")
-    r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    r, g, b = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
     return f"rgba({r},{g},{b},{alpha})"
+
 
 def plot_all_columns(
     df: pd.DataFrame,
@@ -383,3 +385,96 @@ def _calc_relative(values, baseline):
     if baseline == 0:
         return values - baseline
     return ((values - baseline) / abs(baseline)) * 100
+
+
+def plot_portfolio_allocation(
+    strategy_result: pd.DataFrame,
+    ticker1: str = "SPY",
+    ticker2: str = "GLD",
+    height=200,
+    rebalance_dates=None,
+    rebalance_amounts=None,
+):
+    """Plot portfolio allocation percentages over time."""
+    fig = go.Figure()
+
+    # Calculate allocation percentages
+    ticker1_col = f"{ticker1}_cash_value"
+    ticker2_col = f"{ticker2}_cash_value"
+
+    # Validate required columns exist
+    required_cols = [ticker1_col, ticker2_col, "total_cash_value"]
+    for col in required_cols:
+        if col not in strategy_result.columns:
+            raise ValueError(f"Required column '{col}' not found in strategy_result")
+
+    ticker1_cash = strategy_result[ticker1_col]
+    ticker2_cash = strategy_result[ticker2_col]
+    total_cash = strategy_result["total_cash_value"]
+
+    ticker1_pct = (ticker1_cash / total_cash * 100).dropna()
+    ticker2_pct = (ticker2_cash / total_cash * 100).dropna()
+
+    fig.add_trace(
+        go.Scatter(
+            x=ticker1_pct.index,
+            y=ticker1_pct.values,
+            mode="lines",
+            name=f"{ticker1} %",
+            line=dict(color=LINE_CHART_COLORS.get(ticker1, "#666666"), width=1),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=ticker2_pct.index,
+            y=ticker2_pct.values,
+            mode="lines",
+            name=f"{ticker2} %",
+            line=dict(color=LINE_CHART_COLORS.get(ticker2, "#999999"), width=1),
+        )
+    )
+
+    # Add portfolio intention
+    fig.add_hline(
+        y=st.session_state.t1_slider,
+        line=dict(color=LINE_CHART_COLORS["SPY"], width=0.5),
+    )
+    fig.add_hline(
+        y=(100 - st.session_state.t1_slider),
+        line=dict(color=LINE_CHART_COLORS["GLD"], width=0.5),
+    )
+
+    # Add rebalancing lines if provided
+    if rebalance_dates and rebalance_amounts:
+        if len(rebalance_dates) != len(rebalance_amounts):
+            raise ValueError(
+                "rebalance_dates and rebalance_amounts must have the same length"
+            )
+
+        for date, amount in zip(rebalance_dates, rebalance_amounts):
+            if amount > 0:
+                color = LINE_CHART_COLORS["GLD"]  # Buying GLD
+            else:
+                color = LINE_CHART_COLORS["SPY"]  # Buying SPY
+
+            color = hex_to_rgba(color)
+
+            fig.add_shape(
+                type="line",
+                x0=date,
+                x1=date,
+                y0=0,
+                y1=1,
+                yref="paper",
+                line=dict(color=color, width=2, dash="dot"),
+            )
+
+    fig.update_layout(
+        xaxis_title="Date",
+        yaxis_title="Portfolio Allocation %",
+        height=height,
+        margin=dict(l=40, r=40, t=10, b=40),
+    )
+
+    st.plotly_chart(fig, width="stretch")
