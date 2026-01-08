@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from typing import Optional
 
 from .data_downloader import get_two_series
 from .grid_search import run_grid_search
@@ -32,21 +33,23 @@ def run_strategy_with_metrics(
 
 
 @st.cache_data
-def load_data(period: str = "10yr"):
+def load_data(period: str = "10yr", end_date: Optional[str] = None):
     """Load price data (cached for performance)."""
-    return get_two_series(period=period)
+    return get_two_series(period=period, end_date=end_date)
 
 
 @st.cache_data
-def load_grid_search_cached(period: str = "10yr"):
+def load_grid_search_cached(period: str = "10yr", end_date: Optional[str] = None):
     """Run and cache grid search for a period."""
-    data = get_two_series(period=period)
+    data = get_two_series(period=period, end_date=end_date)
     return run_grid_search(data)
 
 
-def load_data_and_search(period: str = "10yr", fast_mode: bool = False):
+def load_data_and_search(
+    period: str = "10yr", fast_mode: bool = False, end_date: Optional[str] = None
+):
     """Load data and conditionally run grid search based on fast mode."""
-    data = load_data(period=period)
+    data = load_data(period=period, end_date=end_date)
 
     if fast_mode:
         # In fast mode, return empty grid results to skip expensive computation
@@ -63,7 +66,7 @@ def load_data_and_search(period: str = "10yr", fast_mode: bool = False):
         )
     else:
         # Normal mode: run grid search (will use cache if available)
-        grid_results = load_grid_search_cached(period=period)
+        grid_results = load_grid_search_cached(period=period, end_date=end_date)
 
     return data, grid_results
 

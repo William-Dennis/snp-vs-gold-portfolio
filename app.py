@@ -16,7 +16,11 @@ from core.ui_components import (
     render_heatmaps,
     render_settings,
 )
-from core.data_downloader import AVAILABLE_PERIODS
+from core.data_downloader import (
+    AVAILABLE_PERIODS,
+    FINAL_YEAR_DEFAULT,
+    get_end_date,
+)
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 st.title("SPY vs GLD Portfolio Analysis")
@@ -30,18 +34,20 @@ Adjust your strategy parameters and compare against grid search results.
 """)
 
 # Date range selection dropdown
+final_year = st.session_state.get("final_year", FINAL_YEAR_DEFAULT)
 period_options = list(AVAILABLE_PERIODS.keys())
 selected_period = st.selectbox(
-    "Select Historical Period (ending 2025-12-31)",
+    f"Select Historical Period (ending {final_year}-12-31)",
     options=period_options,
     index=period_options.index("10yr"),  # Default to 10yr
-    help="Choose the historical period for analysis. All periods end on December 31, 2025.",
+    help=f"Choose the historical period for analysis. All periods end on December 31, {final_year}.",
 )
 
 # Load data and run grid search (skip if fast mode enabled)
 fast_mode = st.session_state.get("fast_mode", False)
+end_date = get_end_date()
 data, grid_search_data = load_data_and_search(
-    period=selected_period, fast_mode=fast_mode
+    period=selected_period, fast_mode=fast_mode, end_date=end_date
 )
 
 # Find optimal strategies
@@ -92,4 +98,5 @@ render_heatmaps(
     best_drawdown,
     fast_mode=fast_mode,
     period=selected_period,
+    end_date=get_end_date(),
 )

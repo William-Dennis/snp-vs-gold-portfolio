@@ -15,7 +15,7 @@ A Streamlit application for analyzing and optimizing two-asset portfolio rebalan
 
 - Explore optimal rebalancing strategies for a two-asset portfolio
 - Adjust strategy parameters and compare against grid search results
-- Analyze different historical periods (ending 2025-12-31)
+- Analyze different historical periods (configurable end year from 2005-2025)
 - View performance charts, metrics tables, and heatmaps
 - Compare strategies based on Sharpe ratio, CAGR, and maximum drawdown
 
