@@ -325,8 +325,12 @@ def render_heatmaps(
 
     # Show parameters used for grid search
     if not fast_mode:
-        # Use provided end_date or extract from period ending text
-        display_end_date = end_date if end_date else f"{FINAL_YEAR_DEFAULT}-12-31"
+        # Use provided end_date or get from session state
+        if not end_date:
+            final_year = st.session_state.get("final_year", FINAL_YEAR_DEFAULT)
+            display_end_date = f"{final_year}-12-31"
+        else:
+            display_end_date = end_date
         st.info(
             f"**Grid Search Parameters:** "
             f"Historical Period: {period} (ending {display_end_date}) | "
