@@ -30,12 +30,13 @@ Adjust your strategy parameters and compare against grid search results.
 """)
 
 # Date range selection dropdown
+final_year = st.session_state.get("final_year", 2025)
 period_options = list(AVAILABLE_PERIODS.keys())
 selected_period = st.selectbox(
-    "Select Historical Period (ending 2025-12-31)",
+    f"Select Historical Period (ending {final_year}-12-31)",
     options=period_options,
     index=period_options.index("10yr"),  # Default to 10yr
-    help="Choose the historical period for analysis. All periods end on December 31, 2025.",
+    help=f"Choose the historical period for analysis. All periods end on December 31, {final_year}.",
 )
 
 # Load data and run grid search

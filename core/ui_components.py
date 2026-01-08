@@ -77,6 +77,15 @@ def render_settings():
     """Render settings in sidebar with advanced options."""
     with st.sidebar:
         st.markdown("### ⚙️ Settings")
+        st.number_input(
+            "Final Year",
+            min_value=2005,
+            max_value=2025,
+            value=2025,
+            step=1,
+            key="final_year",
+            help="End year for historical data analysis",
+        )
         st.checkbox(
             "Show Rebalancing Lines",
             value=False,
