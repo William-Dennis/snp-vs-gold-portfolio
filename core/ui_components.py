@@ -5,7 +5,7 @@ import pandas as pd
 
 from .plotter import plot_2d_heatmap, plot_all_columns, plot_portfolio_allocation
 from .grid_search import STEPS
-from .data_downloader import FIXED_END_DATE
+from .data_downloader import FINAL_YEAR_MIN, FINAL_YEAR_MAX, FINAL_YEAR_DEFAULT
 
 
 def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
@@ -310,6 +310,7 @@ def render_heatmaps(
     best_drawdown,
     fast_mode=False,
     period="10yr",
+    end_date=None,
 ):
     """Render the grid search heatmaps with strategy markers."""
     st.subheader("Grid Search Results")
@@ -324,9 +325,11 @@ def render_heatmaps(
 
     # Show parameters used for grid search
     if not fast_mode:
+        # Use provided end_date or extract from period ending text
+        display_end_date = end_date if end_date else f"{FINAL_YEAR_DEFAULT}-12-31"
         st.info(
             f"**Grid Search Parameters:** "
-            f"Historical Period: {period} (ending {FIXED_END_DATE}) | "
+            f"Historical Period: {period} (ending {display_end_date}) | "
             f"SPY Allocation: 0% - 100% ({STEPS} steps) | "
             f"Rebalance Threshold: 1% - 11% ({STEPS} steps)"
         )

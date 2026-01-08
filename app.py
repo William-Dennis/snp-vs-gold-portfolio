@@ -16,7 +16,11 @@ from core.ui_components import (
     render_heatmaps,
     render_settings,
 )
-from core.data_downloader import AVAILABLE_PERIODS
+from core.data_downloader import (
+    AVAILABLE_PERIODS,
+    FINAL_YEAR_DEFAULT,
+    get_end_date,
+)
 
 st.set_page_config(layout="wide", page_title="SPY vs GLD Analysis")
 st.title("SPY vs GLD Portfolio Analysis")
@@ -93,4 +97,5 @@ render_heatmaps(
     best_drawdown,
     fast_mode=fast_mode,
     period=selected_period,
+    end_date=get_end_date(),
 )

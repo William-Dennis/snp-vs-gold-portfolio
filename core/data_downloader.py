@@ -6,6 +6,14 @@ import streamlit as st
 from datetime import datetime
 
 
+# Final year configuration constants
+FINAL_YEAR_MIN = 2005
+FINAL_YEAR_MAX = 2025
+FINAL_YEAR_DEFAULT = 2025
+
+# Fixed end date for backward compatibility
+FIXED_END_DATE = "2025-12-31"
+
 # Available periods with their years back from end date
 AVAILABLE_PERIODS = {
     "1yr": 1,
