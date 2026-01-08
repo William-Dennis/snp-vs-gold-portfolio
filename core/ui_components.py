@@ -4,6 +4,8 @@ import streamlit as st
 import pandas as pd
 
 from .plotter import plot_2d_heatmap, plot_all_columns, plot_portfolio_allocation
+from .grid_search import STEPS
+from .data_downloader import FIXED_END_DATE
 
 
 def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
@@ -314,9 +316,9 @@ def render_heatmaps(
     # Show parameters used for grid search
     st.info(
         f"**Grid Search Parameters:** "
-        f"Historical Period: {period} (ending 2025-12-31) | "
-        f"SPY Allocation: 0% - 100% (201 steps) | "
-        f"Rebalance Threshold: 1% - 11% (201 steps)"
+        f"Historical Period: {period} (ending {FIXED_END_DATE}) | "
+        f"SPY Allocation: 0% - 100% ({STEPS} steps) | "
+        f"Rebalance Threshold: 1% - 11% ({STEPS} steps)"
     )
 
     # Prepare strategy markers with their positions
