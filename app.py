@@ -78,6 +78,9 @@ render_metrics_table(
     gld_metrics,
 )
 
+# Get fast mode state
+fast_mode = st.session_state.get("fast_mode", False)
+
 render_heatmaps(
     grid_search_data,
     strategy_metrics,
@@ -87,4 +90,6 @@ render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    fast_mode=fast_mode,
+    period=selected_period,
 )

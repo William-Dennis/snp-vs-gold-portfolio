@@ -89,6 +89,12 @@ def render_settings():
             key="show_pct_allocation_chart",
             help="Display a chart showing portfolio allocation percentages of SPY vs GLD",
         )
+        st.checkbox(
+            "Fast Mode",
+            value=False,
+            key="fast_mode",
+            help="Skip grid search recalculation when parameters change (uses cached results)",
+        )
 
 
 def render_performance_chart(data, strategy_result):
@@ -291,9 +297,27 @@ def render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    fast_mode=False,
+    period="10yr",
 ):
     """Render the grid search heatmaps with strategy markers."""
     st.subheader("Grid Search Results")
+
+    # Show warning if fast mode is enabled
+    if fast_mode:
+        st.warning(
+            "⚡ **Fast Mode Enabled** - Grid search results are not updated when parameters change. "
+            "These heatmaps show cached results from previous calculations. "
+            "Disable Fast Mode in settings to recalculate the grid search."
+        )
+
+    # Show parameters used for grid search
+    st.info(
+        f"**Grid Search Parameters:** "
+        f"Historical Period: {period} (ending 2025-12-31) | "
+        f"SPY Allocation: 0% - 100% (201 steps) | "
+        f"Rebalance Threshold: 1% - 11% (201 steps)"
+    )
 
     # Prepare strategy markers with their positions
     strategy_markers = [
