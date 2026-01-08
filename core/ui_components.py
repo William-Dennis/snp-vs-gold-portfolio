@@ -308,18 +308,23 @@ def render_heatmaps(
     # Show warning if fast mode is enabled
     if fast_mode:
         st.warning(
-            "⚡ **Fast Mode Enabled** - Grid search results are not updated when parameters change. "
-            "These heatmaps show cached results from previous calculations. "
-            "Disable Fast Mode in settings to recalculate the grid search."
+            "⚡ **Fast Mode Enabled** - Grid search is SKIPPED to improve performance. "
+            "The heatmaps below will NOT be displayed because the expensive grid search computation "
+            "is not running. Disable Fast Mode in settings to run the grid search and view the heatmaps."
         )
 
     # Show parameters used for grid search
-    st.info(
-        f"**Grid Search Parameters:** "
-        f"Historical Period: {period} (ending {FIXED_END_DATE}) | "
-        f"SPY Allocation: 0% - 100% ({STEPS} steps) | "
-        f"Rebalance Threshold: 1% - 11% ({STEPS} steps)"
-    )
+    if not fast_mode:
+        st.info(
+            f"**Grid Search Parameters:** "
+            f"Historical Period: {period} (ending {FIXED_END_DATE}) | "
+            f"SPY Allocation: 0% - 100% ({STEPS} steps) | "
+            f"Rebalance Threshold: 1% - 11% ({STEPS} steps)"
+        )
+
+    # Skip rendering heatmaps in fast mode (no grid search data available)
+    if fast_mode:
+        return
 
     # Prepare strategy markers with their positions
     strategy_markers = [
