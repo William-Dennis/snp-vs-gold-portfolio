@@ -79,9 +79,9 @@ def render_settings():
         st.markdown("### ⚙️ Settings")
         st.number_input(
             "Final Year",
-            min_value=2005,
-            max_value=2025,
-            value=2025,
+            min_value=FINAL_YEAR_MIN,
+            max_value=FINAL_YEAR_MAX,
+            value=FINAL_YEAR_DEFAULT,
             step=1,
             key="final_year",
             help="End year for historical data analysis",
