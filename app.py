@@ -45,8 +45,9 @@ selected_period = st.selectbox(
 
 # Load data and run grid search (skip if fast mode enabled)
 fast_mode = st.session_state.get("fast_mode", False)
+end_date = get_end_date()
 data, grid_search_data = load_data_and_search(
-    period=selected_period, fast_mode=fast_mode
+    period=selected_period, fast_mode=fast_mode, end_date=end_date
 )
 
 # Find optimal strategies

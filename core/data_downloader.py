@@ -53,9 +53,15 @@ def calculate_start_date(period: str, end_date: str) -> str:
 
 
 @st.cache_data()
-def get_two_series(ticker1: str = "SPY", ticker2: str = "GLD", period: str = "10yr"):
+def get_two_series(
+    ticker1: str = "SPY",
+    ticker2: str = "GLD",
+    period: str = "10yr",
+    end_date: str = None,
+):
     """Get normalized price series for two tickers with data length checking."""
-    end_date = get_end_date()
+    if end_date is None:
+        end_date = get_end_date()
     start_date = calculate_start_date(period, end_date)
 
     s1 = get_daily_data(ticker1, start_date, end_date)
