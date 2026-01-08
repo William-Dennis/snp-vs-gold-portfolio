@@ -38,8 +38,11 @@ selected_period = st.selectbox(
     help="Choose the historical period for analysis. All periods end on December 31, 2025.",
 )
 
-# Load data and run grid search
-data, grid_search_data = load_data_and_search(period=selected_period)
+# Load data and run grid search (skip if fast mode enabled)
+fast_mode = st.session_state.get("fast_mode", False)
+data, grid_search_data = load_data_and_search(
+    period=selected_period, fast_mode=fast_mode
+)
 
 # Find optimal strategies
 best_strategies = get_best_strategies(grid_search_data)
@@ -87,4 +90,6 @@ render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    fast_mode=fast_mode,
+    period=selected_period,
 )
