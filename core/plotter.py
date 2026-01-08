@@ -387,19 +387,29 @@ def _calc_relative(values, baseline):
     return ((values - baseline) / abs(baseline)) * 100
 
 
-def plot_percentage_change(
-    df: pd.DataFrame, ticker1: str = "SPY", ticker2: str = "GLD", height=200
+def plot_portfolio_allocation(
+    strategy_result: pd.DataFrame,
+    ticker1: str = "SPY",
+    ticker2: str = "GLD",
+    height=200,
+    rebalance_dates=None,
+    rebalance_amounts=None,
 ):
-    """Plot daily percentage changes of two tickers."""
+    """Plot portfolio allocation percentages over time."""
     fig = go.Figure()
 
-    pct_change_1 = df[ticker1].pct_change().dropna() * 100
-    pct_change_2 = df[ticker2].pct_change().dropna() * 100
+    # Calculate allocation percentages
+    ticker1_cash = strategy_result[f"{ticker1}_cash_value"]
+    ticker2_cash = strategy_result[f"{ticker2}_cash_value"]
+    total_cash = strategy_result["total_cash_value"]
+
+    ticker1_pct = (ticker1_cash / total_cash * 100).dropna()
+    ticker2_pct = (ticker2_cash / total_cash * 100).dropna()
 
     fig.add_trace(
         go.Scatter(
-            x=pct_change_1.index,
-            y=pct_change_1.values,
+            x=ticker1_pct.index,
+            y=ticker1_pct.values,
             mode="lines",
             name=f"{ticker1} %",
             line=dict(color=LINE_CHART_COLORS.get(ticker1, "#666666"), width=1),
@@ -408,17 +418,37 @@ def plot_percentage_change(
 
     fig.add_trace(
         go.Scatter(
-            x=pct_change_2.index,
-            y=pct_change_2.values,
+            x=ticker2_pct.index,
+            y=ticker2_pct.values,
             mode="lines",
             name=f"{ticker2} %",
             line=dict(color=LINE_CHART_COLORS.get(ticker2, "#999999"), width=1),
         )
     )
 
+    # Add rebalancing lines if provided
+    if rebalance_dates and rebalance_amounts:
+        for date, amount in zip(rebalance_dates, rebalance_amounts):
+            if amount > 0:
+                color = LINE_CHART_COLORS["GLD"]  # Buying GLD
+            else:
+                color = LINE_CHART_COLORS["SPY"]  # Buying SPY
+
+            color = hex_to_rgba(color)
+
+            fig.add_shape(
+                type="line",
+                x0=date,
+                x1=date,
+                y0=0,
+                y1=1,
+                yref="paper",
+                line=dict(color=color, width=2, dash="dot"),
+            )
+
     fig.update_layout(
         xaxis_title="Date",
-        yaxis_title="Daily % Change",
+        yaxis_title="Portfolio Allocation %",
         height=height,
         margin=dict(l=40, r=40, t=10, b=40),
     )

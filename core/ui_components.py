@@ -3,7 +3,7 @@
 import streamlit as st
 import pandas as pd
 
-from .plotter import plot_2d_heatmap, plot_all_columns, plot_percentage_change
+from .plotter import plot_2d_heatmap, plot_all_columns, plot_portfolio_allocation
 
 
 def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
@@ -87,7 +87,7 @@ def render_settings():
             "Show % Change Chart",
             value=False,
             key="show_pct_change_chart",
-            help="Display a chart showing daily percentage changes of SPY vs GLD",
+            help="Display a chart showing portfolio allocation percentages of SPY vs GLD",
         )
 
 
@@ -118,7 +118,14 @@ def render_performance_chart(data, strategy_result):
 
     # Add percentage change chart if enabled
     if st.session_state.get("show_pct_change_chart", False):
-        plot_percentage_change(data, "SPY", "GLD", height=200)
+        plot_portfolio_allocation(
+            strategy_result,
+            "SPY",
+            "GLD",
+            height=200,
+            rebalance_dates=rebalance_dates if show_rebalancing else None,
+            rebalance_amounts=rebalance_amounts if show_rebalancing else None,
+        )
 
 
 def _get_allocation_values(strategy_t1_ratio, best_sharpe, best_cagr, best_drawdown):
