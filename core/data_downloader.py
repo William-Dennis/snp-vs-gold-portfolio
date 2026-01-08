@@ -4,6 +4,7 @@ import yfinance as yf
 import pandas as pd
 import streamlit as st
 from datetime import datetime
+from typing import Optional
 
 
 # Final year configuration constants
@@ -57,7 +58,7 @@ def get_two_series(
     ticker1: str = "SPY",
     ticker2: str = "GLD",
     period: str = "10yr",
-    end_date: str = None,
+    end_date: Optional[str] = None,
 ):
     """Get normalized price series for two tickers with data length checking."""
     if end_date is None:
