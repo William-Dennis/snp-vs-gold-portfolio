@@ -435,6 +435,16 @@ def plot_portfolio_allocation(
         )
     )
 
+    # Add portfolio intention
+    fig.add_hline(
+        y=st.session_state.t1_slider,
+        line=dict(color=LINE_CHART_COLORS["SPY"], width=0.5),
+    )
+    fig.add_hline(
+        y=(100 - st.session_state.t1_slider),
+        line=dict(color=LINE_CHART_COLORS["GLD"], width=0.5),
+    )
+
     # Add rebalancing lines if provided
     if rebalance_dates and rebalance_amounts:
         if len(rebalance_dates) != len(rebalance_amounts):

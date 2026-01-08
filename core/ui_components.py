@@ -84,9 +84,9 @@ def render_settings():
             help="Display vertical lines on the chart indicating when rebalancing occurred",
         )
         st.checkbox(
-            "Show % Change Chart",
+            "Show % Allocation Chart",
             value=False,
-            key="show_pct_change_chart",
+            key="show_pct_allocation_chart",
             help="Display a chart showing portfolio allocation percentages of SPY vs GLD",
         )
 
@@ -117,7 +117,7 @@ def render_performance_chart(data, strategy_result):
     )
 
     # Add percentage change chart if enabled
-    if st.session_state.get("show_pct_change_chart", False):
+    if st.session_state.get("show_pct_allocation_chart", False):
         plot_portfolio_allocation(
             strategy_result,
             "SPY",
