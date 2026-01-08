@@ -4,6 +4,8 @@ import streamlit as st
 import pandas as pd
 
 from .plotter import plot_2d_heatmap, plot_all_columns, plot_portfolio_allocation
+from .grid_search import STEPS
+from .data_downloader import FIXED_END_DATE
 
 
 def _render_preset_buttons(best_sharpe, best_cagr, best_drawdown):
@@ -97,6 +99,12 @@ def render_settings():
             value=False,
             key="show_pct_allocation_chart",
             help="Display a chart showing portfolio allocation percentages of SPY vs GLD",
+        )
+        st.checkbox(
+            "Fast Mode",
+            value=False,
+            key="fast_mode",
+            help="Skip grid search recalculation when parameters change (uses cached results)",
         )
 
 
@@ -300,9 +308,32 @@ def render_heatmaps(
     best_sharpe,
     best_cagr,
     best_drawdown,
+    fast_mode=False,
+    period="10yr",
 ):
     """Render the grid search heatmaps with strategy markers."""
     st.subheader("Grid Search Results")
+
+    # Show warning if fast mode is enabled
+    if fast_mode:
+        st.warning(
+            "⚡ **Fast Mode Enabled** - Grid search is SKIPPED to improve performance. "
+            "The heatmaps below will NOT be displayed because the expensive grid search computation "
+            "is not running. Disable Fast Mode in settings to run the grid search and view the heatmaps."
+        )
+
+    # Show parameters used for grid search
+    if not fast_mode:
+        st.info(
+            f"**Grid Search Parameters:** "
+            f"Historical Period: {period} (ending {FIXED_END_DATE}) | "
+            f"SPY Allocation: 0% - 100% ({STEPS} steps) | "
+            f"Rebalance Threshold: 1% - 11% ({STEPS} steps)"
+        )
+
+    # Skip rendering heatmaps in fast mode (no grid search data available)
+    if fast_mode:
+        return
 
     # Prepare strategy markers with their positions
     strategy_markers = [
