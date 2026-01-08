@@ -19,7 +19,7 @@ AVAILABLE_PERIODS = {
 
 def get_end_date() -> str:
     """Get end date from session state or default to 2025-12-31."""
-    final_year = st.session_state.get("final_year", 2025)
+    final_year = st.session_state.get("final_year", FINAL_YEAR_DEFAULT)
     return f"{final_year}-12-31"
 
 
