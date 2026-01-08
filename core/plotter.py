@@ -399,8 +399,17 @@ def plot_portfolio_allocation(
     fig = go.Figure()
 
     # Calculate allocation percentages
-    ticker1_cash = strategy_result[f"{ticker1}_cash_value"]
-    ticker2_cash = strategy_result[f"{ticker2}_cash_value"]
+    ticker1_col = f"{ticker1}_cash_value"
+    ticker2_col = f"{ticker2}_cash_value"
+
+    # Validate required columns exist
+    required_cols = [ticker1_col, ticker2_col, "total_cash_value"]
+    for col in required_cols:
+        if col not in strategy_result.columns:
+            raise ValueError(f"Required column '{col}' not found in strategy_result")
+
+    ticker1_cash = strategy_result[ticker1_col]
+    ticker2_cash = strategy_result[ticker2_col]
     total_cash = strategy_result["total_cash_value"]
 
     ticker1_pct = (ticker1_cash / total_cash * 100).dropna()
@@ -428,6 +437,11 @@ def plot_portfolio_allocation(
 
     # Add rebalancing lines if provided
     if rebalance_dates and rebalance_amounts:
+        if len(rebalance_dates) != len(rebalance_amounts):
+            raise ValueError(
+                "rebalance_dates and rebalance_amounts must have the same length"
+            )
+
         for date, amount in zip(rebalance_dates, rebalance_amounts):
             if amount > 0:
                 color = LINE_CHART_COLORS["GLD"]  # Buying GLD
