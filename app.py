@@ -30,7 +30,7 @@ Adjust your strategy parameters and compare against grid search results.
 """)
 
 # Date range selection dropdown
-final_year = st.session_state.get("final_year", 2025)
+final_year = st.session_state.get("final_year", FINAL_YEAR_DEFAULT)
 period_options = list(AVAILABLE_PERIODS.keys())
 selected_period = st.selectbox(
     f"Select Historical Period (ending {final_year}-12-31)",
